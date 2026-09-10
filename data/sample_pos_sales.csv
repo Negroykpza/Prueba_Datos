@@ -1,0 +1,811 @@
+Fecha,Plato,Cantidad Vendida
+13/06/2026,Ceviche Mixto,33
+13/06/2026,Ceviche Clásico,36
+13/06/2026,Lomo Saltado,36
+13/06/2026,Pastel de Choclo,28
+13/06/2026,Salmón Grillé,22
+13/06/2026,Tartar de Atún,18
+13/06/2026,Empanada de Pino,56
+13/06/2026,Machas a la Parmesana,29
+13/06/2026,Cazuela de Vacuno,20
+14/06/2026,Ceviche Mixto,24
+14/06/2026,Ceviche Clásico,25
+14/06/2026,Lomo Saltado,23
+14/06/2026,Pastel de Choclo,19
+14/06/2026,Salmón Grillé,13
+14/06/2026,Tartar de Atún,10
+14/06/2026,Empanada de Pino,34
+14/06/2026,Machas a la Parmesana,18
+14/06/2026,Cazuela de Vacuno,15
+15/06/2026,Ceviche Mixto,12
+15/06/2026,Ceviche Clásico,12
+15/06/2026,Lomo Saltado,19
+15/06/2026,Pastel de Choclo,11
+15/06/2026,Salmón Grillé,10
+15/06/2026,Tartar de Atún,5
+15/06/2026,Empanada de Pino,20
+15/06/2026,Machas a la Parmesana,12
+15/06/2026,Cazuela de Vacuno,7
+16/06/2026,Ceviche Mixto,15
+16/06/2026,Ceviche Clásico,14
+16/06/2026,Lomo Saltado,14
+16/06/2026,Pastel de Choclo,10
+16/06/2026,Salmón Grillé,14
+16/06/2026,Tartar de Atún,8
+16/06/2026,Empanada de Pino,18
+16/06/2026,Machas a la Parmesana,14
+16/06/2026,Cazuela de Vacuno,7
+17/06/2026,Ceviche Mixto,17
+17/06/2026,Ceviche Clásico,13
+17/06/2026,Lomo Saltado,14
+17/06/2026,Pastel de Choclo,13
+17/06/2026,Salmón Grillé,13
+17/06/2026,Tartar de Atún,10
+17/06/2026,Empanada de Pino,25
+17/06/2026,Machas a la Parmesana,13
+17/06/2026,Cazuela de Vacuno,8
+18/06/2026,Ceviche Mixto,17
+18/06/2026,Ceviche Clásico,20
+18/06/2026,Lomo Saltado,23
+18/06/2026,Pastel de Choclo,16
+18/06/2026,Salmón Grillé,10
+18/06/2026,Tartar de Atún,11
+18/06/2026,Empanada de Pino,28
+18/06/2026,Machas a la Parmesana,15
+18/06/2026,Cazuela de Vacuno,13
+19/06/2026,Ceviche Mixto,31
+19/06/2026,Ceviche Clásico,36
+19/06/2026,Lomo Saltado,28
+19/06/2026,Pastel de Choclo,22
+19/06/2026,Salmón Grillé,21
+19/06/2026,Tartar de Atún,18
+19/06/2026,Empanada de Pino,43
+19/06/2026,Machas a la Parmesana,24
+19/06/2026,Cazuela de Vacuno,17
+20/06/2026,Ceviche Mixto,29
+20/06/2026,Ceviche Clásico,38
+20/06/2026,Lomo Saltado,38
+20/06/2026,Pastel de Choclo,25
+20/06/2026,Salmón Grillé,25
+20/06/2026,Tartar de Atún,19
+20/06/2026,Empanada de Pino,47
+20/06/2026,Machas a la Parmesana,28
+20/06/2026,Cazuela de Vacuno,23
+21/06/2026,Ceviche Mixto,23
+21/06/2026,Ceviche Clásico,31
+21/06/2026,Lomo Saltado,17
+21/06/2026,Pastel de Choclo,20
+21/06/2026,Salmón Grillé,17
+21/06/2026,Tartar de Atún,13
+21/06/2026,Empanada de Pino,37
+21/06/2026,Machas a la Parmesana,15
+21/06/2026,Cazuela de Vacuno,15
+22/06/2026,Ceviche Mixto,15
+22/06/2026,Ceviche Clásico,20
+22/06/2026,Lomo Saltado,14
+22/06/2026,Pastel de Choclo,9
+22/06/2026,Salmón Grillé,9
+22/06/2026,Tartar de Atún,10
+22/06/2026,Empanada de Pino,23
+22/06/2026,Machas a la Parmesana,11
+22/06/2026,Cazuela de Vacuno,10
+23/06/2026,Ceviche Mixto,14
+23/06/2026,Ceviche Clásico,19
+23/06/2026,Lomo Saltado,13
+23/06/2026,Pastel de Choclo,10
+23/06/2026,Salmón Grillé,9
+23/06/2026,Tartar de Atún,5
+23/06/2026,Empanada de Pino,23
+23/06/2026,Machas a la Parmesana,13
+23/06/2026,Cazuela de Vacuno,9
+24/06/2026,Ceviche Mixto,16
+24/06/2026,Ceviche Clásico,14
+24/06/2026,Lomo Saltado,16
+24/06/2026,Pastel de Choclo,12
+24/06/2026,Salmón Grillé,10
+24/06/2026,Tartar de Atún,9
+24/06/2026,Empanada de Pino,27
+24/06/2026,Machas a la Parmesana,18
+24/06/2026,Cazuela de Vacuno,11
+25/06/2026,Ceviche Mixto,20
+25/06/2026,Ceviche Clásico,21
+25/06/2026,Lomo Saltado,15
+25/06/2026,Pastel de Choclo,15
+25/06/2026,Salmón Grillé,14
+25/06/2026,Tartar de Atún,15
+25/06/2026,Empanada de Pino,29
+25/06/2026,Machas a la Parmesana,17
+25/06/2026,Cazuela de Vacuno,12
+26/06/2026,Ceviche Mixto,26
+26/06/2026,Ceviche Clásico,36
+26/06/2026,Lomo Saltado,33
+26/06/2026,Pastel de Choclo,24
+26/06/2026,Salmón Grillé,19
+26/06/2026,Tartar de Atún,19
+26/06/2026,Empanada de Pino,39
+26/06/2026,Machas a la Parmesana,26
+26/06/2026,Cazuela de Vacuno,22
+27/06/2026,Ceviche Mixto,29
+27/06/2026,Ceviche Clásico,34
+27/06/2026,Lomo Saltado,34
+27/06/2026,Pastel de Choclo,24
+27/06/2026,Salmón Grillé,19
+27/06/2026,Tartar de Atún,18
+27/06/2026,Empanada de Pino,45
+27/06/2026,Machas a la Parmesana,28
+27/06/2026,Cazuela de Vacuno,19
+28/06/2026,Ceviche Mixto,27
+28/06/2026,Ceviche Clásico,24
+28/06/2026,Lomo Saltado,24
+28/06/2026,Pastel de Choclo,20
+28/06/2026,Salmón Grillé,14
+28/06/2026,Tartar de Atún,14
+28/06/2026,Empanada de Pino,42
+28/06/2026,Machas a la Parmesana,16
+28/06/2026,Cazuela de Vacuno,15
+29/06/2026,Ceviche Mixto,15
+29/06/2026,Ceviche Clásico,18
+29/06/2026,Lomo Saltado,12
+29/06/2026,Pastel de Choclo,8
+29/06/2026,Salmón Grillé,11
+29/06/2026,Tartar de Atún,9
+29/06/2026,Empanada de Pino,23
+29/06/2026,Machas a la Parmesana,13
+29/06/2026,Cazuela de Vacuno,8
+30/06/2026,Ceviche Mixto,15
+30/06/2026,Ceviche Clásico,17
+30/06/2026,Lomo Saltado,13
+30/06/2026,Pastel de Choclo,15
+30/06/2026,Salmón Grillé,11
+30/06/2026,Tartar de Atún,6
+30/06/2026,Empanada de Pino,25
+30/06/2026,Machas a la Parmesana,10
+30/06/2026,Cazuela de Vacuno,10
+01/07/2026,Ceviche Mixto,19
+01/07/2026,Ceviche Clásico,16
+01/07/2026,Lomo Saltado,20
+01/07/2026,Pastel de Choclo,13
+01/07/2026,Salmón Grillé,13
+01/07/2026,Tartar de Atún,13
+01/07/2026,Empanada de Pino,24
+01/07/2026,Machas a la Parmesana,12
+01/07/2026,Cazuela de Vacuno,9
+02/07/2026,Ceviche Mixto,17
+02/07/2026,Ceviche Clásico,21
+02/07/2026,Lomo Saltado,21
+02/07/2026,Pastel de Choclo,15
+02/07/2026,Salmón Grillé,15
+02/07/2026,Tartar de Atún,11
+02/07/2026,Empanada de Pino,36
+02/07/2026,Machas a la Parmesana,16
+02/07/2026,Cazuela de Vacuno,16
+03/07/2026,Ceviche Mixto,30
+03/07/2026,Ceviche Clásico,30
+03/07/2026,Lomo Saltado,28
+03/07/2026,Pastel de Choclo,24
+03/07/2026,Salmón Grillé,20
+03/07/2026,Tartar de Atún,18
+03/07/2026,Empanada de Pino,47
+03/07/2026,Machas a la Parmesana,24
+03/07/2026,Cazuela de Vacuno,17
+04/07/2026,Ceviche Mixto,28
+04/07/2026,Ceviche Clásico,35
+04/07/2026,Lomo Saltado,36
+04/07/2026,Pastel de Choclo,25
+04/07/2026,Salmón Grillé,20
+04/07/2026,Tartar de Atún,18
+04/07/2026,Empanada de Pino,51
+04/07/2026,Machas a la Parmesana,25
+04/07/2026,Cazuela de Vacuno,20
+05/07/2026,Ceviche Mixto,23
+05/07/2026,Ceviche Clásico,23
+05/07/2026,Lomo Saltado,26
+05/07/2026,Pastel de Choclo,19
+05/07/2026,Salmón Grillé,19
+05/07/2026,Tartar de Atún,15
+05/07/2026,Empanada de Pino,31
+05/07/2026,Machas a la Parmesana,18
+05/07/2026,Cazuela de Vacuno,16
+06/07/2026,Ceviche Mixto,15
+06/07/2026,Ceviche Clásico,18
+06/07/2026,Lomo Saltado,26
+06/07/2026,Pastel de Choclo,12
+06/07/2026,Salmón Grillé,12
+06/07/2026,Tartar de Atún,10
+06/07/2026,Empanada de Pino,25
+06/07/2026,Machas a la Parmesana,11
+06/07/2026,Cazuela de Vacuno,10
+07/07/2026,Ceviche Mixto,12
+07/07/2026,Ceviche Clásico,15
+07/07/2026,Lomo Saltado,14
+07/07/2026,Pastel de Choclo,11
+07/07/2026,Salmón Grillé,15
+07/07/2026,Tartar de Atún,5
+07/07/2026,Empanada de Pino,25
+07/07/2026,Machas a la Parmesana,8
+07/07/2026,Cazuela de Vacuno,8
+08/07/2026,Ceviche Mixto,19
+08/07/2026,Ceviche Clásico,19
+08/07/2026,Lomo Saltado,14
+08/07/2026,Pastel de Choclo,11
+08/07/2026,Salmón Grillé,13
+08/07/2026,Tartar de Atún,8
+08/07/2026,Empanada de Pino,26
+08/07/2026,Machas a la Parmesana,14
+08/07/2026,Cazuela de Vacuno,9
+09/07/2026,Ceviche Mixto,24
+09/07/2026,Ceviche Clásico,24
+09/07/2026,Lomo Saltado,15
+09/07/2026,Pastel de Choclo,15
+09/07/2026,Salmón Grillé,12
+09/07/2026,Tartar de Atún,12
+09/07/2026,Empanada de Pino,27
+09/07/2026,Machas a la Parmesana,16
+09/07/2026,Cazuela de Vacuno,13
+10/07/2026,Ceviche Mixto,31
+10/07/2026,Ceviche Clásico,29
+10/07/2026,Lomo Saltado,30
+10/07/2026,Pastel de Choclo,22
+10/07/2026,Salmón Grillé,19
+10/07/2026,Tartar de Atún,20
+10/07/2026,Empanada de Pino,47
+10/07/2026,Machas a la Parmesana,22
+10/07/2026,Cazuela de Vacuno,20
+11/07/2026,Ceviche Mixto,37
+11/07/2026,Ceviche Clásico,39
+11/07/2026,Lomo Saltado,29
+11/07/2026,Pastel de Choclo,24
+11/07/2026,Salmón Grillé,25
+11/07/2026,Tartar de Atún,17
+11/07/2026,Empanada de Pino,51
+11/07/2026,Machas a la Parmesana,29
+11/07/2026,Cazuela de Vacuno,19
+12/07/2026,Ceviche Mixto,23
+12/07/2026,Ceviche Clásico,17
+12/07/2026,Lomo Saltado,22
+12/07/2026,Pastel de Choclo,18
+12/07/2026,Salmón Grillé,14
+12/07/2026,Tartar de Atún,16
+12/07/2026,Empanada de Pino,31
+12/07/2026,Machas a la Parmesana,19
+12/07/2026,Cazuela de Vacuno,15
+13/07/2026,Ceviche Mixto,18
+13/07/2026,Ceviche Clásico,12
+13/07/2026,Lomo Saltado,18
+13/07/2026,Pastel de Choclo,11
+13/07/2026,Salmón Grillé,8
+13/07/2026,Tartar de Atún,9
+13/07/2026,Empanada de Pino,23
+13/07/2026,Machas a la Parmesana,11
+13/07/2026,Cazuela de Vacuno,9
+14/07/2026,Ceviche Mixto,13
+14/07/2026,Ceviche Clásico,16
+14/07/2026,Lomo Saltado,17
+14/07/2026,Pastel de Choclo,14
+14/07/2026,Salmón Grillé,8
+14/07/2026,Tartar de Atún,12
+14/07/2026,Empanada de Pino,14
+14/07/2026,Machas a la Parmesana,12
+14/07/2026,Cazuela de Vacuno,10
+15/07/2026,Ceviche Mixto,17
+15/07/2026,Ceviche Clásico,17
+15/07/2026,Lomo Saltado,17
+15/07/2026,Pastel de Choclo,12
+15/07/2026,Salmón Grillé,10
+15/07/2026,Tartar de Atún,11
+15/07/2026,Empanada de Pino,27
+15/07/2026,Machas a la Parmesana,12
+15/07/2026,Cazuela de Vacuno,12
+16/07/2026,Ceviche Mixto,20
+16/07/2026,Ceviche Clásico,24
+16/07/2026,Lomo Saltado,22
+16/07/2026,Pastel de Choclo,13
+16/07/2026,Salmón Grillé,12
+16/07/2026,Tartar de Atún,12
+16/07/2026,Empanada de Pino,32
+16/07/2026,Machas a la Parmesana,16
+16/07/2026,Cazuela de Vacuno,12
+17/07/2026,Ceviche Mixto,32
+17/07/2026,Ceviche Clásico,31
+17/07/2026,Lomo Saltado,32
+17/07/2026,Pastel de Choclo,22
+17/07/2026,Salmón Grillé,20
+17/07/2026,Tartar de Atún,18
+17/07/2026,Empanada de Pino,48
+17/07/2026,Machas a la Parmesana,26
+17/07/2026,Cazuela de Vacuno,20
+18/07/2026,Ceviche Mixto,32
+18/07/2026,Ceviche Clásico,38
+18/07/2026,Lomo Saltado,33
+18/07/2026,Pastel de Choclo,25
+18/07/2026,Salmón Grillé,22
+18/07/2026,Tartar de Atún,18
+18/07/2026,Empanada de Pino,52
+18/07/2026,Machas a la Parmesana,25
+18/07/2026,Cazuela de Vacuno,23
+19/07/2026,Ceviche Mixto,21
+19/07/2026,Ceviche Clásico,23
+19/07/2026,Lomo Saltado,28
+19/07/2026,Pastel de Choclo,20
+19/07/2026,Salmón Grillé,18
+19/07/2026,Tartar de Atún,14
+19/07/2026,Empanada de Pino,36
+19/07/2026,Machas a la Parmesana,18
+19/07/2026,Cazuela de Vacuno,15
+20/07/2026,Ceviche Mixto,12
+20/07/2026,Ceviche Clásico,19
+20/07/2026,Lomo Saltado,15
+20/07/2026,Pastel de Choclo,9
+20/07/2026,Salmón Grillé,9
+20/07/2026,Tartar de Atún,9
+20/07/2026,Empanada de Pino,20
+20/07/2026,Machas a la Parmesana,10
+20/07/2026,Cazuela de Vacuno,9
+21/07/2026,Ceviche Mixto,15
+21/07/2026,Ceviche Clásico,14
+21/07/2026,Lomo Saltado,14
+21/07/2026,Pastel de Choclo,11
+21/07/2026,Salmón Grillé,7
+21/07/2026,Tartar de Atún,5
+21/07/2026,Empanada de Pino,19
+21/07/2026,Machas a la Parmesana,12
+21/07/2026,Cazuela de Vacuno,9
+22/07/2026,Ceviche Mixto,20
+22/07/2026,Ceviche Clásico,21
+22/07/2026,Lomo Saltado,17
+22/07/2026,Pastel de Choclo,13
+22/07/2026,Salmón Grillé,9
+22/07/2026,Tartar de Atún,9
+22/07/2026,Empanada de Pino,24
+22/07/2026,Machas a la Parmesana,15
+22/07/2026,Cazuela de Vacuno,9
+23/07/2026,Ceviche Mixto,20
+23/07/2026,Ceviche Clásico,26
+23/07/2026,Lomo Saltado,20
+23/07/2026,Pastel de Choclo,16
+23/07/2026,Salmón Grillé,15
+23/07/2026,Tartar de Atún,10
+23/07/2026,Empanada de Pino,31
+23/07/2026,Machas a la Parmesana,16
+23/07/2026,Cazuela de Vacuno,12
+24/07/2026,Ceviche Mixto,27
+24/07/2026,Ceviche Clásico,33
+24/07/2026,Lomo Saltado,32
+24/07/2026,Pastel de Choclo,25
+24/07/2026,Salmón Grillé,22
+24/07/2026,Tartar de Atún,20
+24/07/2026,Empanada de Pino,42
+24/07/2026,Machas a la Parmesana,27
+24/07/2026,Cazuela de Vacuno,19
+25/07/2026,Ceviche Mixto,37
+25/07/2026,Ceviche Clásico,34
+25/07/2026,Lomo Saltado,31
+25/07/2026,Pastel de Choclo,24
+25/07/2026,Salmón Grillé,18
+25/07/2026,Tartar de Atún,17
+25/07/2026,Empanada de Pino,46
+25/07/2026,Machas a la Parmesana,27
+25/07/2026,Cazuela de Vacuno,21
+26/07/2026,Ceviche Mixto,28
+26/07/2026,Ceviche Clásico,29
+26/07/2026,Lomo Saltado,23
+26/07/2026,Pastel de Choclo,16
+26/07/2026,Salmón Grillé,17
+26/07/2026,Tartar de Atún,11
+26/07/2026,Empanada de Pino,44
+26/07/2026,Machas a la Parmesana,22
+26/07/2026,Cazuela de Vacuno,14
+27/07/2026,Ceviche Mixto,10
+27/07/2026,Ceviche Clásico,20
+27/07/2026,Lomo Saltado,15
+27/07/2026,Pastel de Choclo,13
+27/07/2026,Salmón Grillé,7
+27/07/2026,Tartar de Atún,7
+27/07/2026,Empanada de Pino,22
+27/07/2026,Machas a la Parmesana,12
+27/07/2026,Cazuela de Vacuno,8
+28/07/2026,Ceviche Mixto,16
+28/07/2026,Ceviche Clásico,13
+28/07/2026,Lomo Saltado,15
+28/07/2026,Pastel de Choclo,11
+28/07/2026,Salmón Grillé,11
+28/07/2026,Tartar de Atún,9
+28/07/2026,Empanada de Pino,18
+28/07/2026,Machas a la Parmesana,9
+28/07/2026,Cazuela de Vacuno,11
+29/07/2026,Ceviche Mixto,17
+29/07/2026,Ceviche Clásico,16
+29/07/2026,Lomo Saltado,22
+29/07/2026,Pastel de Choclo,13
+29/07/2026,Salmón Grillé,14
+29/07/2026,Tartar de Atún,9
+29/07/2026,Empanada de Pino,34
+29/07/2026,Machas a la Parmesana,18
+29/07/2026,Cazuela de Vacuno,10
+30/07/2026,Ceviche Mixto,21
+30/07/2026,Ceviche Clásico,24
+30/07/2026,Lomo Saltado,24
+30/07/2026,Pastel de Choclo,13
+30/07/2026,Salmón Grillé,15
+30/07/2026,Tartar de Atún,13
+30/07/2026,Empanada de Pino,23
+30/07/2026,Machas a la Parmesana,14
+30/07/2026,Cazuela de Vacuno,9
+31/07/2026,Ceviche Mixto,28
+31/07/2026,Ceviche Clásico,35
+31/07/2026,Lomo Saltado,35
+31/07/2026,Pastel de Choclo,23
+31/07/2026,Salmón Grillé,24
+31/07/2026,Tartar de Atún,14
+31/07/2026,Empanada de Pino,38
+31/07/2026,Machas a la Parmesana,24
+31/07/2026,Cazuela de Vacuno,19
+01/08/2026,Ceviche Mixto,31
+01/08/2026,Ceviche Clásico,30
+01/08/2026,Lomo Saltado,34
+01/08/2026,Pastel de Choclo,22
+01/08/2026,Salmón Grillé,24
+01/08/2026,Tartar de Atún,19
+01/08/2026,Empanada de Pino,46
+01/08/2026,Machas a la Parmesana,26
+01/08/2026,Cazuela de Vacuno,19
+02/08/2026,Ceviche Mixto,23
+02/08/2026,Ceviche Clásico,29
+02/08/2026,Lomo Saltado,22
+02/08/2026,Pastel de Choclo,19
+02/08/2026,Salmón Grillé,15
+02/08/2026,Tartar de Atún,12
+02/08/2026,Empanada de Pino,36
+02/08/2026,Machas a la Parmesana,18
+02/08/2026,Cazuela de Vacuno,14
+03/08/2026,Ceviche Mixto,11
+03/08/2026,Ceviche Clásico,22
+03/08/2026,Lomo Saltado,15
+03/08/2026,Pastel de Choclo,10
+03/08/2026,Salmón Grillé,10
+03/08/2026,Tartar de Atún,8
+03/08/2026,Empanada de Pino,21
+03/08/2026,Machas a la Parmesana,13
+03/08/2026,Cazuela de Vacuno,10
+04/08/2026,Ceviche Mixto,13
+04/08/2026,Ceviche Clásico,14
+04/08/2026,Lomo Saltado,14
+04/08/2026,Pastel de Choclo,6
+04/08/2026,Salmón Grillé,7
+04/08/2026,Tartar de Atún,10
+04/08/2026,Empanada de Pino,29
+04/08/2026,Machas a la Parmesana,11
+04/08/2026,Cazuela de Vacuno,10
+05/08/2026,Ceviche Mixto,17
+05/08/2026,Ceviche Clásico,28
+05/08/2026,Lomo Saltado,20
+05/08/2026,Pastel de Choclo,12
+05/08/2026,Salmón Grillé,10
+05/08/2026,Tartar de Atún,6
+05/08/2026,Empanada de Pino,26
+05/08/2026,Machas a la Parmesana,12
+05/08/2026,Cazuela de Vacuno,8
+06/08/2026,Ceviche Mixto,17
+06/08/2026,Ceviche Clásico,18
+06/08/2026,Lomo Saltado,25
+06/08/2026,Pastel de Choclo,17
+06/08/2026,Salmón Grillé,13
+06/08/2026,Tartar de Atún,13
+06/08/2026,Empanada de Pino,30
+06/08/2026,Machas a la Parmesana,14
+06/08/2026,Cazuela de Vacuno,14
+07/08/2026,Ceviche Mixto,30
+07/08/2026,Ceviche Clásico,30
+07/08/2026,Lomo Saltado,30
+07/08/2026,Pastel de Choclo,21
+07/08/2026,Salmón Grillé,18
+07/08/2026,Tartar de Atún,18
+07/08/2026,Empanada de Pino,53
+07/08/2026,Machas a la Parmesana,22
+07/08/2026,Cazuela de Vacuno,19
+08/08/2026,Ceviche Mixto,30
+08/08/2026,Ceviche Clásico,35
+08/08/2026,Lomo Saltado,32
+08/08/2026,Pastel de Choclo,23
+08/08/2026,Salmón Grillé,23
+08/08/2026,Tartar de Atún,17
+08/08/2026,Empanada de Pino,51
+08/08/2026,Machas a la Parmesana,27
+08/08/2026,Cazuela de Vacuno,20
+09/08/2026,Ceviche Mixto,21
+09/08/2026,Ceviche Clásico,25
+09/08/2026,Lomo Saltado,27
+09/08/2026,Pastel de Choclo,19
+09/08/2026,Salmón Grillé,15
+09/08/2026,Tartar de Atún,13
+09/08/2026,Empanada de Pino,39
+09/08/2026,Machas a la Parmesana,16
+09/08/2026,Cazuela de Vacuno,16
+10/08/2026,Ceviche Mixto,12
+10/08/2026,Ceviche Clásico,18
+10/08/2026,Lomo Saltado,13
+10/08/2026,Pastel de Choclo,7
+10/08/2026,Salmón Grillé,7
+10/08/2026,Tartar de Atún,8
+10/08/2026,Empanada de Pino,23
+10/08/2026,Machas a la Parmesana,10
+10/08/2026,Cazuela de Vacuno,10
+11/08/2026,Ceviche Mixto,10
+11/08/2026,Ceviche Clásico,16
+11/08/2026,Lomo Saltado,12
+11/08/2026,Pastel de Choclo,10
+11/08/2026,Salmón Grillé,10
+11/08/2026,Tartar de Atún,6
+11/08/2026,Empanada de Pino,20
+11/08/2026,Machas a la Parmesana,14
+11/08/2026,Cazuela de Vacuno,8
+12/08/2026,Ceviche Mixto,18
+12/08/2026,Ceviche Clásico,15
+12/08/2026,Lomo Saltado,19
+12/08/2026,Pastel de Choclo,16
+12/08/2026,Salmón Grillé,7
+12/08/2026,Tartar de Atún,8
+12/08/2026,Empanada de Pino,28
+12/08/2026,Machas a la Parmesana,13
+12/08/2026,Cazuela de Vacuno,11
+13/08/2026,Ceviche Mixto,17
+13/08/2026,Ceviche Clásico,22
+13/08/2026,Lomo Saltado,20
+13/08/2026,Pastel de Choclo,17
+13/08/2026,Salmón Grillé,14
+13/08/2026,Tartar de Atún,11
+13/08/2026,Empanada de Pino,28
+13/08/2026,Machas a la Parmesana,15
+13/08/2026,Cazuela de Vacuno,12
+14/08/2026,Ceviche Mixto,30
+14/08/2026,Ceviche Clásico,32
+14/08/2026,Lomo Saltado,32
+14/08/2026,Pastel de Choclo,27
+14/08/2026,Salmón Grillé,22
+14/08/2026,Tartar de Atún,16
+14/08/2026,Empanada de Pino,50
+14/08/2026,Machas a la Parmesana,24
+14/08/2026,Cazuela de Vacuno,15
+15/08/2026,Ceviche Mixto,29
+15/08/2026,Ceviche Clásico,30
+15/08/2026,Lomo Saltado,33
+15/08/2026,Pastel de Choclo,25
+15/08/2026,Salmón Grillé,26
+15/08/2026,Tartar de Atún,19
+15/08/2026,Empanada de Pino,49
+15/08/2026,Machas a la Parmesana,29
+15/08/2026,Cazuela de Vacuno,17
+16/08/2026,Ceviche Mixto,24
+16/08/2026,Ceviche Clásico,29
+16/08/2026,Lomo Saltado,21
+16/08/2026,Pastel de Choclo,20
+16/08/2026,Salmón Grillé,17
+16/08/2026,Tartar de Atún,12
+16/08/2026,Empanada de Pino,39
+16/08/2026,Machas a la Parmesana,25
+16/08/2026,Cazuela de Vacuno,15
+17/08/2026,Ceviche Mixto,15
+17/08/2026,Ceviche Clásico,15
+17/08/2026,Lomo Saltado,13
+17/08/2026,Pastel de Choclo,13
+17/08/2026,Salmón Grillé,8
+17/08/2026,Tartar de Atún,8
+17/08/2026,Empanada de Pino,20
+17/08/2026,Machas a la Parmesana,13
+17/08/2026,Cazuela de Vacuno,10
+18/08/2026,Ceviche Mixto,17
+18/08/2026,Ceviche Clásico,14
+18/08/2026,Lomo Saltado,14
+18/08/2026,Pastel de Choclo,9
+18/08/2026,Salmón Grillé,9
+18/08/2026,Tartar de Atún,9
+18/08/2026,Empanada de Pino,25
+18/08/2026,Machas a la Parmesana,10
+18/08/2026,Cazuela de Vacuno,10
+19/08/2026,Ceviche Mixto,19
+19/08/2026,Ceviche Clásico,20
+19/08/2026,Lomo Saltado,23
+19/08/2026,Pastel de Choclo,11
+19/08/2026,Salmón Grillé,9
+19/08/2026,Tartar de Atún,6
+19/08/2026,Empanada de Pino,31
+19/08/2026,Machas a la Parmesana,15
+19/08/2026,Cazuela de Vacuno,10
+20/08/2026,Ceviche Mixto,20
+20/08/2026,Ceviche Clásico,18
+20/08/2026,Lomo Saltado,27
+20/08/2026,Pastel de Choclo,15
+20/08/2026,Salmón Grillé,14
+20/08/2026,Tartar de Atún,12
+20/08/2026,Empanada de Pino,32
+20/08/2026,Machas a la Parmesana,17
+20/08/2026,Cazuela de Vacuno,11
+21/08/2026,Ceviche Mixto,30
+21/08/2026,Ceviche Clásico,38
+21/08/2026,Lomo Saltado,35
+21/08/2026,Pastel de Choclo,26
+21/08/2026,Salmón Grillé,19
+21/08/2026,Tartar de Atún,15
+21/08/2026,Empanada de Pino,45
+21/08/2026,Machas a la Parmesana,25
+21/08/2026,Cazuela de Vacuno,20
+22/08/2026,Ceviche Mixto,27
+22/08/2026,Ceviche Clásico,41
+22/08/2026,Lomo Saltado,33
+22/08/2026,Pastel de Choclo,24
+22/08/2026,Salmón Grillé,20
+22/08/2026,Tartar de Atún,15
+22/08/2026,Empanada de Pino,53
+22/08/2026,Machas a la Parmesana,27
+22/08/2026,Cazuela de Vacuno,18
+23/08/2026,Ceviche Mixto,20
+23/08/2026,Ceviche Clásico,25
+23/08/2026,Lomo Saltado,29
+23/08/2026,Pastel de Choclo,18
+23/08/2026,Salmón Grillé,13
+23/08/2026,Tartar de Atún,13
+23/08/2026,Empanada de Pino,35
+23/08/2026,Machas a la Parmesana,14
+23/08/2026,Cazuela de Vacuno,15
+24/08/2026,Ceviche Mixto,13
+24/08/2026,Ceviche Clásico,18
+24/08/2026,Lomo Saltado,20
+24/08/2026,Pastel de Choclo,13
+24/08/2026,Salmón Grillé,9
+24/08/2026,Tartar de Atún,6
+24/08/2026,Empanada de Pino,32
+24/08/2026,Machas a la Parmesana,12
+24/08/2026,Cazuela de Vacuno,9
+25/08/2026,Ceviche Mixto,14
+25/08/2026,Ceviche Clásico,17
+25/08/2026,Lomo Saltado,15
+25/08/2026,Pastel de Choclo,10
+25/08/2026,Salmón Grillé,9
+25/08/2026,Tartar de Atún,8
+25/08/2026,Empanada de Pino,20
+25/08/2026,Machas a la Parmesana,10
+25/08/2026,Cazuela de Vacuno,9
+26/08/2026,Ceviche Mixto,15
+26/08/2026,Ceviche Clásico,23
+26/08/2026,Lomo Saltado,10
+26/08/2026,Pastel de Choclo,15
+26/08/2026,Salmón Grillé,14
+26/08/2026,Tartar de Atún,5
+26/08/2026,Empanada de Pino,24
+26/08/2026,Machas a la Parmesana,13
+26/08/2026,Cazuela de Vacuno,8
+27/08/2026,Ceviche Mixto,17
+27/08/2026,Ceviche Clásico,18
+27/08/2026,Lomo Saltado,25
+27/08/2026,Pastel de Choclo,17
+27/08/2026,Salmón Grillé,16
+27/08/2026,Tartar de Atún,12
+27/08/2026,Empanada de Pino,25
+27/08/2026,Machas a la Parmesana,15
+27/08/2026,Cazuela de Vacuno,13
+28/08/2026,Ceviche Mixto,26
+28/08/2026,Ceviche Clásico,35
+28/08/2026,Lomo Saltado,30
+28/08/2026,Pastel de Choclo,22
+28/08/2026,Salmón Grillé,22
+28/08/2026,Tartar de Atún,17
+28/08/2026,Empanada de Pino,44
+28/08/2026,Machas a la Parmesana,27
+28/08/2026,Cazuela de Vacuno,17
+29/08/2026,Ceviche Mixto,33
+29/08/2026,Ceviche Clásico,38
+29/08/2026,Lomo Saltado,33
+29/08/2026,Pastel de Choclo,25
+29/08/2026,Salmón Grillé,20
+29/08/2026,Tartar de Atún,20
+29/08/2026,Empanada de Pino,49
+29/08/2026,Machas a la Parmesana,26
+29/08/2026,Cazuela de Vacuno,22
+30/08/2026,Ceviche Mixto,21
+30/08/2026,Ceviche Clásico,22
+30/08/2026,Lomo Saltado,20
+30/08/2026,Pastel de Choclo,19
+30/08/2026,Salmón Grillé,14
+30/08/2026,Tartar de Atún,16
+30/08/2026,Empanada de Pino,28
+30/08/2026,Machas a la Parmesana,24
+30/08/2026,Cazuela de Vacuno,15
+31/08/2026,Ceviche Mixto,14
+31/08/2026,Ceviche Clásico,14
+31/08/2026,Lomo Saltado,16
+31/08/2026,Pastel de Choclo,11
+31/08/2026,Salmón Grillé,12
+31/08/2026,Tartar de Atún,8
+31/08/2026,Empanada de Pino,23
+31/08/2026,Machas a la Parmesana,11
+31/08/2026,Cazuela de Vacuno,9
+01/09/2026,Ceviche Mixto,15
+01/09/2026,Ceviche Clásico,11
+01/09/2026,Lomo Saltado,11
+01/09/2026,Pastel de Choclo,12
+01/09/2026,Salmón Grillé,10
+01/09/2026,Tartar de Atún,8
+01/09/2026,Empanada de Pino,22
+01/09/2026,Machas a la Parmesana,13
+01/09/2026,Cazuela de Vacuno,8
+02/09/2026,Ceviche Mixto,14
+02/09/2026,Ceviche Clásico,19
+02/09/2026,Lomo Saltado,15
+02/09/2026,Pastel de Choclo,13
+02/09/2026,Salmón Grillé,8
+02/09/2026,Tartar de Atún,11
+02/09/2026,Empanada de Pino,27
+02/09/2026,Machas a la Parmesana,14
+02/09/2026,Cazuela de Vacuno,12
+03/09/2026,Ceviche Mixto,23
+03/09/2026,Ceviche Clásico,25
+03/09/2026,Lomo Saltado,15
+03/09/2026,Pastel de Choclo,12
+03/09/2026,Salmón Grillé,12
+03/09/2026,Tartar de Atún,11
+03/09/2026,Empanada de Pino,32
+03/09/2026,Machas a la Parmesana,15
+03/09/2026,Cazuela de Vacuno,12
+04/09/2026,Ceviche Mixto,27
+04/09/2026,Ceviche Clásico,31
+04/09/2026,Lomo Saltado,27
+04/09/2026,Pastel de Choclo,21
+04/09/2026,Salmón Grillé,18
+04/09/2026,Tartar de Atún,15
+04/09/2026,Empanada de Pino,49
+04/09/2026,Machas a la Parmesana,23
+04/09/2026,Cazuela de Vacuno,22
+05/09/2026,Ceviche Mixto,33
+05/09/2026,Ceviche Clásico,37
+05/09/2026,Lomo Saltado,31
+05/09/2026,Pastel de Choclo,26
+05/09/2026,Salmón Grillé,21
+05/09/2026,Tartar de Atún,18
+05/09/2026,Empanada de Pino,60
+05/09/2026,Machas a la Parmesana,27
+05/09/2026,Cazuela de Vacuno,22
+06/09/2026,Ceviche Mixto,21
+06/09/2026,Ceviche Clásico,26
+06/09/2026,Lomo Saltado,30
+06/09/2026,Pastel de Choclo,17
+06/09/2026,Salmón Grillé,20
+06/09/2026,Tartar de Atún,14
+06/09/2026,Empanada de Pino,34
+06/09/2026,Machas a la Parmesana,21
+06/09/2026,Cazuela de Vacuno,16
+07/09/2026,Ceviche Mixto,16
+07/09/2026,Ceviche Clásico,11
+07/09/2026,Lomo Saltado,13
+07/09/2026,Pastel de Choclo,11
+07/09/2026,Salmón Grillé,10
+07/09/2026,Tartar de Atún,9
+07/09/2026,Empanada de Pino,23
+07/09/2026,Machas a la Parmesana,9
+07/09/2026,Cazuela de Vacuno,10
+08/09/2026,Ceviche Mixto,16
+08/09/2026,Ceviche Clásico,18
+08/09/2026,Lomo Saltado,18
+08/09/2026,Pastel de Choclo,13
+08/09/2026,Salmón Grillé,11
+08/09/2026,Tartar de Atún,8
+08/09/2026,Empanada de Pino,15
+08/09/2026,Machas a la Parmesana,13
+08/09/2026,Cazuela de Vacuno,9
+09/09/2026,Ceviche Mixto,17
+09/09/2026,Ceviche Clásico,15
+09/09/2026,Lomo Saltado,14
+09/09/2026,Pastel de Choclo,15
+09/09/2026,Salmón Grillé,11
+09/09/2026,Tartar de Atún,10
+09/09/2026,Empanada de Pino,25
+09/09/2026,Machas a la Parmesana,14
+09/09/2026,Cazuela de Vacuno,12
+10/09/2026,Ceviche Mixto,18
+10/09/2026,Ceviche Clásico,22
+10/09/2026,Lomo Saltado,19
+10/09/2026,Pastel de Choclo,14
+10/09/2026,Salmón Grillé,13
+10/09/2026,Tartar de Atún,11
+10/09/2026,Empanada de Pino,28
+10/09/2026,Machas a la Parmesana,19
+10/09/2026,Cazuela de Vacuno,11

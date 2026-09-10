@@ -1,0 +1,182 @@
+[
+  {
+    "dish_name": "Ceviche Mixto",
+    "categoria": "Pescados y Mariscos",
+    "ingredients": [
+      {
+        "ingredient_name": "Pescado Blanco Fresco (Reineta)",
+        "quantity_per_dish": 180.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Cebolla Morada",
+        "quantity_per_dish": 50.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  },
+  {
+    "dish_name": "Ceviche Clásico",
+    "categoria": "Pescados y Mariscos",
+    "ingredients": [
+      {
+        "ingredient_name": "Pescado Blanco Fresco (Reineta)",
+        "quantity_per_dish": 200.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Limón Sutil",
+        "quantity_per_dish": 4.0,
+        "recipe_unit": "un",
+        "purchase_unit": "un",
+        "conversion_factor": 1.0
+      }
+    ]
+  },
+  {
+    "dish_name": "Lomo Saltado",
+    "categoria": "Carnes",
+    "ingredients": [
+      {
+        "ingredient_name": "Lomo Liso Vacuno",
+        "quantity_per_dish": 220.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Tomate Chonto",
+        "quantity_per_dish": 100.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  },
+  {
+    "dish_name": "Pastel de Choclo",
+    "categoria": "Platos Chilenos",
+    "ingredients": [
+      {
+        "ingredient_name": "Pasta de Choclo Fresca",
+        "quantity_per_dish": 300.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Pechuga de Pollo",
+        "quantity_per_dish": 120.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  },
+  {
+    "dish_name": "Salmón Grillé",
+    "categoria": "Pescados y Mariscos",
+    "ingredients": [
+      {
+        "ingredient_name": "Filete de Salmón Fresco",
+        "quantity_per_dish": 220.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Espárragos Frescos",
+        "quantity_per_dish": 120.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  },
+  {
+    "dish_name": "Tartar de Atún",
+    "categoria": "Entradas",
+    "ingredients": [
+      {
+        "ingredient_name": "Atún Fresco",
+        "quantity_per_dish": 160.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Palta Hass",
+        "quantity_per_dish": 1.0,
+        "recipe_unit": "un",
+        "purchase_unit": "un",
+        "conversion_factor": 1.0
+      }
+    ]
+  },
+  {
+    "dish_name": "Empanada de Pino",
+    "categoria": "Entradas",
+    "ingredients": [
+      {
+        "ingredient_name": "Carne Picada Vacuno (Posta)",
+        "quantity_per_dish": 90.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Cebolla Picada",
+        "quantity_per_dish": 120.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  },
+  {
+    "dish_name": "Machas a la Parmesana",
+    "categoria": "Pescados y Mariscos",
+    "ingredients": [
+      {
+        "ingredient_name": "Lenguas de Machas Frescas",
+        "quantity_per_dish": 150.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Queso Parmesano Rallado",
+        "quantity_per_dish": 40.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  },
+  {
+    "dish_name": "Cazuela de Vacuno",
+    "categoria": "Platos Chilenos",
+    "ingredients": [
+      {
+        "ingredient_name": "Corte de Vacuno (Osobuco/Tapa Pecho)",
+        "quantity_per_dish": 250.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      },
+      {
+        "ingredient_name": "Zapallo Camote Fresco",
+        "quantity_per_dish": 150.0,
+        "recipe_unit": "g",
+        "purchase_unit": "kg",
+        "conversion_factor": 0.001
+      }
+    ]
+  }
+]
