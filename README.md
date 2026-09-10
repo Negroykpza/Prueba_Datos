@@ -1,4 +1,4 @@
-# 🥑 GastroMerma Chile | SaaS de Reducción de Mermas Gastronómicas
+# EZtock Chile | SaaS de Reducción de Mermas Gastronómicas
 
 > **Plataforma MVP en Python y Streamlit** diseñada para restaurantes independientes de Chile. Convierte el historial de ventas exportado desde sistemas POS (Toteat, Bsale, Fudo, Loyverse o Excel) en proyecciones inteligentes de demanda de insumos perecibles y genera la **Lista de Compras Sugerida para el Fin de Semana**, aplicando un margen de seguridad del 15% para evitar quiebres y eliminar el sobrestock.
 
