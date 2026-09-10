@@ -108,6 +108,53 @@ class TestProcurementService(unittest.TestCase):
         # Un PDF válido comienza con %PDF
         self.assertTrue(pdf_bytes.startswith(b"%PDF"))
 
+    def test_financial_kpis_and_supplier_features(self):
+        df_mock = pd.DataFrame([
+            {
+                "insumo": "Pescado Blanco Fresco (Reineta)",
+                "total_sugerido": 20.0,
+                "unidad": "kg",
+                "cost_per_unit": 9500.0,
+                "subtotal_cost_clp": 190000.0,
+                "riesgo_caducidad": "CRÍTICO",
+                "detalle_riesgo": "Vida útil 24-48h refrigerado",
+                "proveedor": "🐟 Terminal Pesquero (Pescados y Mariscos)"
+            },
+            {
+                "insumo": "Cebolla Morada",
+                "total_sugerido": 15.0,
+                "unidad": "kg",
+                "cost_per_unit": 1200.0,
+                "subtotal_cost_clp": 18000.0,
+                "riesgo_caducidad": "BAJO",
+                "detalle_riesgo": "Vida útil > 7 días",
+                "proveedor": "🥬 La Vega Central (Frutas y Verduras)"
+            }
+        ])
+        forecast_mock = pd.DataFrame([
+            {"plato": "Ceviche Mixto", "demanda_con_margen": 50.0, "es_fin_de_semana": True}
+        ])
+
+        kpis = self.procurement.calculate_financial_kpis(df_mock, forecast_mock, is_weekend_only=True)
+        self.assertGreater(kpis["ahorro_mes_clp"], 0)
+        self.assertEqual(kpis["puntos_fuga_clp"], 190000.0) # Reineta es crítica
+        self.assertGreater(kpis["food_cost_pct"], 0)
+
+        alerts = self.procurement.get_operational_alerts(df_mock)
+        self.assertTrue(len(alerts["frena_compras"]) > 0)
+        self.assertTrue(len(alerts["promociones"]) > 0)
+
+        # Test WhatsApp por proveedor
+        msg = self.procurement.format_supplier_whatsapp_message(
+            "🐟 Terminal Pesquero",
+            df_mock.iloc[[0]],
+            restaurant_name="Restaurante Test"
+        )
+        self.assertIn("Terminal Pesquero", msg)
+        self.assertIn("Reineta", msg)
+        self.assertIn("190.000", msg)
+
 
 if __name__ == "__main__":
     unittest.main()
+

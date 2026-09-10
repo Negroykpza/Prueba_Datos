@@ -75,3 +75,38 @@ POS_COLUMN_ALIASES = {
     "plato": ["plato", "item", "producto", "descripcion", "articulo", "item_name", "nombre_producto"],
     "cantidad": ["cantidad", "cant", "cantidad_vendida", "unidades", "qty", "quantity", "cant_vendida", "total_unidades"]
 }
+
+# Precios promedio de venta al público en carta en Chile ($ CLP)
+DEFAULT_DISH_SALE_PRICES_CLP = {
+    "ceviche mixto": 12900,
+    "ceviche clásico": 11500,
+    "ceviche clasico": 11500,
+    "lomo saltado": 13900,
+    "pastel de choclo": 9900,
+    "salmón grillé": 14500,
+    "salmon grille": 14500,
+    "tartar de atún": 12900,
+    "tartar de atun": 12900,
+    "empanada de pino": 3500,
+    "machas a la parmesana": 11900,
+    "cazuela de vacuno": 9500,
+    "default": 10500
+}
+
+# Proveedores habituales por tipo de insumo en Chile
+SUPPLIER_KEYWORDS = {
+    "🐟 Terminal Pesquero (Pescados y Mariscos)": [
+        "pescado", "reineta", "salmón", "salmon", "atún", "atun", "macha", "machas", "corvina", "marisco", "camaron", "camarón", "congrio"
+    ],
+    "🥩 Carnicería Central (Carnes y Aves)": [
+        "lomo", "vacuno", "posta", "pollo", "carne", "osobuco", "tapa pecho", "asado", "cerdo"
+    ],
+    "🥬 La Vega Central (Frutas y Verduras)": [
+        "cebolla", "limón", "limon", "palta", "choclo", "tomate", "espárrago", "esparrago", "zapallo", "perejil", "cilantro", "ajo", "lechuga"
+    ],
+    "🧀 Distribuidora Lácteos y Abarrotes": [
+        "queso", "crema", "leche", "mantequilla", "aceite", "huevo", "huevos", "aceituna", "aceitunas", "harina", "arroz"
+    ]
+}
+DEFAULT_SUPPLIER = "🏪 Distribuidora General"
+
