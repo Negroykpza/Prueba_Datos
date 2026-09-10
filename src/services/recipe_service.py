@@ -1,10 +1,10 @@
-"""Servicio para la gestión, almacenamiento y persistencia de escandallos (fichas técnicas simples)."""
+"""Servicio para la gestión, almacenamiento y persistencia de escandallos con costeo en pesos chilenos ($ CLP)."""
 
 import json
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 import pandas as pd
-from src.config import DEFAULT_RECIPES_PATH, ACTIVE_RECIPES_PATH
+from src.config import DEFAULT_RECIPES_PATH, ACTIVE_RECIPES_PATH, DEFAULT_INGREDIENT_PRICES_CLP
 from src.models.schema import Recipe, IngredientRequirement
 
 
@@ -99,28 +99,127 @@ class RecipeService:
                 unmapped.append(dish)
         return mapped, unmapped
 
+    def ensure_dishes_exist(self, detected_dishes: List[str]):
+        """
+        Asegura que todos los platos detectados dinámicamente en el CSV tengan
+        al menos una receta base para que aparezcan en el editor interactivo.
+        """
+        changes = False
+        for dish in detected_dishes:
+            clean = dish.strip().title()
+            if not self.get_recipe(clean):
+                # Generar insumo sugerido con precio base
+                suggested_ing = "Insumo Perecible Principal"
+                default_price = float(DEFAULT_INGREDIENT_PRICES_CLP["default"])
+                
+                # Deducción inteligente de insumo común
+                dish_lower = clean.lower()
+                if "ceviche" in dish_lower or "pescado" in dish_lower or "reineta" in dish_lower:
+                    suggested_ing = "Pescado Blanco Fresco (Reineta)"
+                    default_price = 9500.0
+                elif "salmón" in dish_lower or "salmon" in dish_lower:
+                    suggested_ing = "Filete de Salmón Fresco"
+                    default_price = 14000.0
+                elif "lomo" in dish_lower or "carne" in dish_lower or "vacuno" in dish_lower:
+                    suggested_ing = "Lomo Liso Vacuno"
+                    default_price = 9800.0
+                elif "pollo" in dish_lower:
+                    suggested_ing = "Pechuga de Pollo"
+                    default_price = 4800.0
+
+                new_rec = Recipe(
+                    dish_name=clean,
+                    categoria="Carta General",
+                    ingredients=[
+                        IngredientRequirement(
+                            ingredient_name=suggested_ing,
+                            quantity_per_dish=180.0,
+                            recipe_unit="g",
+                            purchase_unit="kg",
+                            conversion_factor=0.001,
+                            cost_per_unit=default_price
+                        )
+                    ]
+                )
+                self.recipes[clean] = new_rec
+                changes = True
+
+        if changes:
+            self.save_to_disk()
+
     def to_dataframe(self) -> pd.DataFrame:
-        """Convierte los escandallos a un DataFrame tabular plano para presentación en UI."""
+        """Convierte los escandallos a un DataFrame tabular plano para edición interactiva en Streamlit."""
         rows = []
         for recipe in self.get_all_recipes():
             if not recipe.ingredients:
                 rows.append({
                     "Plato": recipe.dish_name,
-                    "Categoría": recipe.categoria,
-                    "Insumo Perecible": "Sin insumos asignados",
+                    "Insumo Perecible": "Sin insumo asignado",
                     "Dosis por Plato": 0.0,
-                    "Unidad Receta": "-",
-                    "Unidad Compra": "-"
+                    "Unidad Receta": "g",
+                    "Precio Compra ($ CLP)": 0.0,
+                    "Unidad Compra": "kg"
                 })
             else:
                 for ing in recipe.ingredients:
                     rows.append({
                         "Plato": recipe.dish_name,
-                        "Categoría": recipe.categoria,
                         "Insumo Perecible": ing.ingredient_name,
-                        "Dosis por Plato": ing.quantity_per_dish,
+                        "Dosis por Plato": float(ing.quantity_per_dish),
                         "Unidad Receta": ing.recipe_unit,
+                        "Precio Compra ($ CLP)": float(ing.cost_per_unit),
                         "Unidad Compra": ing.purchase_unit
                     })
 
         return pd.DataFrame(rows)
+
+    def update_from_dataframe(self, df: pd.DataFrame):
+        """
+        Reconstruye y persiste la lista de escandallos a partir de los datos editados
+        en el st.data_editor de Streamlit.
+        """
+        if df.empty:
+            return
+
+        new_recipes: Dict[str, Recipe] = {}
+
+        for _, row in df.iterrows():
+            plato = str(row["Plato"]).strip().title()
+            insumo = str(row["Insumo Perecible"]).strip()
+            
+            if not plato or not insumo or insumo == "Sin insumo asignado":
+                continue
+
+            try:
+                dosis = float(row["Dosis por Plato"])
+            except (ValueError, TypeError):
+                dosis = 100.0
+
+            try:
+                precio_clp = float(row["Precio Compra ($ CLP)"])
+            except (ValueError, TypeError):
+                precio_clp = 5000.0
+
+            runit = str(row.get("Unidad Receta", "g")).strip().lower()
+            punit = str(row.get("Unidad Compra", "kg")).strip().lower()
+
+            factor = 0.001 if (runit == "g" and punit == "kg") or (runit == "ml" and punit == "l") else 1.0
+
+            req = IngredientRequirement(
+                ingredient_name=insumo,
+                quantity_per_dish=dosis,
+                recipe_unit=runit,
+                purchase_unit=punit,
+                conversion_factor=factor,
+                cost_per_unit=precio_clp
+            )
+
+            if plato not in new_recipes:
+                existing = self.get_recipe(plato)
+                cat = existing.categoria if existing else "General"
+                new_recipes[plato] = Recipe(dish_name=plato, categoria=cat, ingredients=[])
+
+            new_recipes[plato].ingredients.append(req)
+
+        self.recipes = new_recipes
+        self.save_to_disk()

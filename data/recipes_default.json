@@ -8,14 +8,16 @@
         "quantity_per_dish": 180.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 9500.0
       },
       {
         "ingredient_name": "Cebolla Morada",
         "quantity_per_dish": 50.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 1200.0
       }
     ]
   },
@@ -28,14 +30,16 @@
         "quantity_per_dish": 200.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 9500.0
       },
       {
         "ingredient_name": "Limón Sutil",
         "quantity_per_dish": 4.0,
         "recipe_unit": "un",
         "purchase_unit": "un",
-        "conversion_factor": 1.0
+        "conversion_factor": 1.0,
+        "cost_per_unit": 350.0
       }
     ]
   },
@@ -48,14 +52,16 @@
         "quantity_per_dish": 220.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 9800.0
       },
       {
         "ingredient_name": "Tomate Chonto",
         "quantity_per_dish": 100.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 1500.0
       }
     ]
   },
@@ -68,14 +74,16 @@
         "quantity_per_dish": 300.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 2200.0
       },
       {
         "ingredient_name": "Pechuga de Pollo",
         "quantity_per_dish": 120.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 4800.0
       }
     ]
   },
@@ -88,14 +96,16 @@
         "quantity_per_dish": 220.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 14000.0
       },
       {
         "ingredient_name": "Espárragos Frescos",
         "quantity_per_dish": 120.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 4200.0
       }
     ]
   },
@@ -108,14 +118,16 @@
         "quantity_per_dish": 160.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 13500.0
       },
       {
         "ingredient_name": "Palta Hass",
         "quantity_per_dish": 1.0,
         "recipe_unit": "un",
         "purchase_unit": "un",
-        "conversion_factor": 1.0
+        "conversion_factor": 1.0,
+        "cost_per_unit": 1200.0
       }
     ]
   },
@@ -128,14 +140,16 @@
         "quantity_per_dish": 90.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 8800.0
       },
       {
         "ingredient_name": "Cebolla Picada",
         "quantity_per_dish": 120.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 1200.0
       }
     ]
   },
@@ -148,14 +162,16 @@
         "quantity_per_dish": 150.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 8500.0
       },
       {
         "ingredient_name": "Queso Parmesano Rallado",
         "quantity_per_dish": 40.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 8900.0
       }
     ]
   },
@@ -168,14 +184,16 @@
         "quantity_per_dish": 250.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 7800.0
       },
       {
         "ingredient_name": "Zapallo Camote Fresco",
         "quantity_per_dish": 150.0,
         "recipe_unit": "g",
         "purchase_unit": "kg",
-        "conversion_factor": 0.001
+        "conversion_factor": 0.001,
+        "cost_per_unit": 1400.0
       }
     ]
   }

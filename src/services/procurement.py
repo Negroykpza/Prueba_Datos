@@ -1,4 +1,4 @@
-"""Servicio de cálculo de requerimientos de materias primas, estimación de mermas y exportación (WhatsApp, Excel, PDF)."""
+"""Servicio de cálculo de requerimientos de materias primas, costeo en CLP, estimación de mermas y exportaciones EZtock."""
 
 import io
 from typing import Dict, List, Optional, Tuple
@@ -8,22 +8,10 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from src.services.recipe_service import RecipeService
+from src.config import APP_NAME, APP_TAGLINE
 
 
-# Costo promedio referencial por kg de insumos en ferias mayoristas de Chile (CLP)
-ESTIMATED_COST_PER_KG_CLP = {
-    "pescado": 9500,    # Reineta / Corvina fresca
-    "salmón": 14000,    # Filete de salmón
-    "vacuno": 9800,     # Lomo liso / posta
-    "pollo": 4800,      # Pechuga
-    "atún": 13500,      # Atún fresco
-    "machas": 8500,     # Machas
-    "cebolla": 1200,    # Saco cebolla morada
-    "limón": 1800,      # Malla limón sutil
-    "default": 6500     # Promedio ponderado general
-}
-
-# Niveles de riesgo de merma por caducidad
+# Niveles de riesgo de merma por caducidad en gastronomía chilena
 SHELF_LIFE_RISK = {
     "Pescado Blanco Fresco (Reineta)": ("CRÍTICO", "Vida útil 24-48h refrigerado", "#EF4444"),
     "Filete de Salmón Fresco": ("CRÍTICO", "Vida útil 48h refrigerado", "#EF4444"),
@@ -40,7 +28,7 @@ SHELF_LIFE_RISK = {
 
 
 class ProcurementService:
-    """Traduce la proyección de platos a volúmenes de compra de insumos perecibles (kg/unidades)."""
+    """Traduce la proyección de platos a volúmenes de compra de insumos perecibles con costeo en CLP."""
 
     def __init__(self, recipe_service: RecipeService):
         self.recipe_service = recipe_service
@@ -51,8 +39,8 @@ class ProcurementService:
         only_weekend: bool = True
     ) -> pd.DataFrame:
         """
-        Calcula la lista de compras agrupada por insumo perecible para el período proyectado.
-        Si only_weekend=True, considera únicamente las ventas de Viernes, Sábado y Domingo.
+        Calcula la lista de compras agrupada por insumo perecible con cantidades en kg/unidades
+        y valorización en pesos chilenos ($ CLP).
         """
         if forecast_df.empty:
             return pd.DataFrame()
@@ -91,6 +79,7 @@ class ProcurementService:
                 ingredient_records.append({
                     "insumo": ing.ingredient_name,
                     "unidad": ing.purchase_unit,
+                    "cost_per_unit": ing.cost_per_unit,
                     "plato_origen": dish_name,
                     "consumo_base": base_qty,
                     "margen_seguridad": margin_qty,
@@ -106,6 +95,7 @@ class ProcurementService:
         aggregated = (
             ing_df.groupby(["insumo", "unidad"], as_index=False)
             .agg({
+                "cost_per_unit": "first",
                 "consumo_base": "sum",
                 "margen_seguridad": "sum",
                 "total_sugerido": "sum",
@@ -116,10 +106,12 @@ class ProcurementService:
             .reset_index(drop=True)
         )
 
-        # Redondear valores
+        # Redondeo y cálculo de costo total en CLP
         aggregated["consumo_base"] = aggregated["consumo_base"].round(2)
         aggregated["margen_seguridad"] = aggregated["margen_seguridad"].round(2)
         aggregated["total_sugerido"] = aggregated["total_sugerido"].round(2)
+        aggregated["cost_per_unit"] = aggregated["cost_per_unit"].round(0)
+        aggregated["subtotal_cost_clp"] = (aggregated["total_sugerido"] * aggregated["cost_per_unit"]).round(0)
 
         # Asignar riesgo de caducidad
         def get_risk(insumo_name: str) -> Tuple[str, str]:
@@ -134,64 +126,65 @@ class ProcurementService:
 
         return aggregated
 
-    def calculate_waste_metrics(self, shopping_df: pd.DataFrame) -> Dict[str, float]:
+    def calculate_waste_and_cost_metrics(
+        self,
+        shopping_df: pd.DataFrame,
+        is_weekend_only: bool = True
+    ) -> Dict[str, float]:
         """
-        Calcula las métricas de merma estimada y ahorro en Food Cost.
-        En restaurantes sin planificación predictiva, el sobrestock de fin de semana
-        provoca mermas típicas del 15% al 25% del volumen comprado que se descarta el lunes.
+        Calcula el costo total de la orden en $ CLP y el Ahorro Estimado Mensual ($ CLP)
+        frente a la compra intuitiva tradicional que provoca sobrestock y merma el lunes.
         """
         if shopping_df.empty:
             return {
-                "kg_en_riesgo": 0.0,
-                "kg_ahorro_merma": 0.0,
-                "ahorro_clp": 0.0,
-                "porcentaje_reduccion_merma": 65.0
+                "total_orden_clp": 0.0,
+                "ahorro_periodo_clp": 0.0,
+                "ahorro_mensual_clp": 0.0,
+                "total_kg_compras": 0.0,
+                "kg_ahorro_merma": 0.0
             }
 
+        total_orden_clp = float(shopping_df["subtotal_cost_clp"].sum())
+
         kg_df = shopping_df[shopping_df["unidad"] == "kg"]
-        total_kg = kg_df["total_sugerido"].sum() if not kg_df.empty else 0.0
+        total_kg = float(kg_df["total_sugerido"].sum()) if not kg_df.empty else 0.0
 
-        # Estimación conservadora:
-        # - Compra intuitiva tradicional genera ~18% de sobrestock no vendido que caduca.
-        # - Con el colchón ajustado del 15%, la merma por descomposición cae a menos del 5%.
-        # - Ahorro neto en merma: ~13% del volumen total en kg.
-        kg_ahorro = total_kg * 0.13
-        kg_en_riesgo = total_kg * 0.18
+        # En restaurantes chilenos sin planificación, la compra intuitiva de fin de semana
+        # genera entre 15% y 22% de sobrestock perecible que se desecha el lunes.
+        # Con EZtock (+15% de margen controlado), se evita un 14% de gasto innecesario en merma.
+        ahorro_periodo_clp = total_orden_clp * 0.14
+        kg_ahorro_merma = total_kg * 0.14
 
-        # Estimación monetaria en CLP
-        ahorro_clp = 0.0
-        for _, row in kg_df.iterrows():
-            name = row["insumo"].lower()
-            kg_val = row["total_sugerido"] * 0.13
-            cost_per_kg = ESTIMATED_COST_PER_KG_CLP["default"]
-            for key, cost in ESTIMATED_COST_PER_KG_CLP.items():
-                if key in name:
-                    cost_per_kg = cost
-                    break
-            ahorro_clp += kg_val * cost_per_kg
+        # Proyección mensual (si es fin de semana, se proyectan 4.3 fines de semana por mes)
+        factor_mensual = 4.3 if is_weekend_only else 4.3
+        ahorro_mensual_clp = ahorro_periodo_clp * factor_mensual
 
         return {
+            "total_orden_clp": round(total_orden_clp, 0),
+            "ahorro_periodo_clp": round(ahorro_periodo_clp, 0),
+            "ahorro_mensual_clp": round(ahorro_mensual_clp, 0),
             "total_kg_compras": round(total_kg, 1),
-            "kg_en_riesgo": round(kg_en_riesgo, 1),
-            "kg_ahorro_merma": round(kg_ahorro, 1),
-            "ahorro_clp": round(ahorro_clp, 0),
-            "porcentaje_reduccion_merma": 65.0
+            "kg_ahorro_merma": round(kg_ahorro_merma, 1)
         }
 
     def format_whatsapp_message(
         self,
         shopping_df: pd.DataFrame,
         restaurant_name: str = "Mi Restaurante",
-        periodo_label: str = "Fin de Semana"
+        periodo_label: str = "Fin de Semana",
+        metrics: Optional[Dict] = None
     ) -> str:
-        """Genera un mensaje de texto formateado listo para enviar a proveedores por WhatsApp."""
+        """Genera un mensaje de texto formateado listo para enviar a proveedores bajo la marca EZtock."""
         if shopping_df.empty:
             return "No hay insumos proyectados para el período seleccionado."
 
+        total_clp_str = f"${int(metrics['total_orden_clp']):,}".replace(",", ".") if metrics else ""
+
         lines = [
-            f"🛒 *PEDIDO DE COMPRAS - {restaurant_name.upper()}*",
+            f"🛒 *ORDEN DE COMPRA - {APP_NAME.upper()}*",
+            f"🏪 *Restaurante:* {restaurant_name}",
             f"📅 *Período:* {periodo_label}",
-            "🛡️ *Cálculo:* Demanda esperada + 15% margen de seguridad",
+            "🛡️ *Colchón:* Demanda calculada + 15% seguridad",
             "─────────────────────────"
         ]
 
@@ -199,12 +192,17 @@ class ProcurementService:
             insumo = row["insumo"]
             total = row["total_sugerido"]
             unidad = row["unidad"]
+            cost_val = row.get('subtotal_cost_clp', 0.0)
+            subtotal = f"${int(cost_val):,}".replace(",", ".") if cost_val > 0 else ""
+            subtotal_str = f" ({subtotal} CLP)" if subtotal else ""
             riesgo = row.get("riesgo_caducidad", "MEDIO")
             icono = "🔴" if riesgo == "CRÍTICO" else ("🟠" if riesgo == "ALTO" else "🟢")
-            lines.append(f"{icono} *{insumo}*: {total} {unidad}")
+            lines.append(f"{icono} *{insumo}*: {total} {unidad}{subtotal_str}")
 
         lines.append("─────────────────────────")
-        lines.append("🥑 *GastroMerma Chile* | Control inteligente de Food Cost")
+        if total_clp_str:
+            lines.append(f"💰 *COSTO ESTIMADO ORDEN:* {total_clp_str} CLP")
+        lines.append(f"🥑 *{APP_NAME}* | {APP_TAGLINE}")
         return "\n".join(lines)
 
     def generate_pdf_report(
@@ -213,9 +211,9 @@ class ProcurementService:
         restaurant_name: str = "Restaurante",
         periodo_label: str = "Fin de Semana",
         safety_margin_pct: int = 15,
-        waste_metrics: Optional[Dict] = None
+        metrics: Optional[Dict] = None
     ) -> bytes:
-        """Genera un documento PDF formal con la orden de compra sugerida usando ReportLab."""
+        """Genera un documento PDF formal bajo la marca EZtock con valorización en CLP."""
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
             buffer,
@@ -233,79 +231,95 @@ class ProcurementService:
             fontSize=18,
             leading=22,
             textColor=colors.HexColor("#0F172A"),
-            spaceAfter=6
+            spaceAfter=4
         )
         subtitle_style = ParagraphStyle(
             'ReportSubtitle',
             parent=styles['Normal'],
-            fontSize=10,
-            leading=14,
-            textColor=colors.HexColor("#475569"),
-            spaceAfter=12
-        )
-        alert_style = ParagraphStyle(
-            'AlertStyle',
-            parent=styles['Normal'],
             fontSize=9,
             leading=13,
-            textColor=colors.HexColor("#1E3A8A"),
+            textColor=colors.HexColor("#475569"),
+            spaceAfter=10
+        )
+        kpi_style = ParagraphStyle(
+            'KPIStyle',
+            parent=styles['Normal'],
+            fontSize=10,
+            leading=14,
+            textColor=colors.HexColor("#065F46"),
             spaceAfter=12
         )
 
         story = []
 
-        # Título y encabezado
-        story.append(Paragraph(f"<b>LISTA DE COMPRAS SUGERIDA | {restaurant_name.upper()}</b>", title_style))
+        # Encabezado EZtock
+        story.append(Paragraph(f"<b>{APP_NAME.upper()} | ORDEN DE COMPRAS SUGERIDA</b>", title_style))
         story.append(Paragraph(
+            f"<b>Restaurante:</b> {restaurant_name.upper()} &nbsp;&nbsp;|&nbsp;&nbsp; "
             f"<b>Período:</b> {periodo_label} &nbsp;&nbsp;|&nbsp;&nbsp; "
-            f"<b>Margen de Seguridad:</b> +{safety_margin_pct}% &nbsp;&nbsp;|&nbsp;&nbsp; "
-            f"<b>Generado por:</b> GastroMerma SaaS 🇨🇱",
+            f"<b>Margen de Seguridad:</b> +{safety_margin_pct}%",
             subtitle_style
         ))
 
-        if waste_metrics:
-            ahorro_str = f"${int(waste_metrics['ahorro_clp']):,}".replace(",", ".")
+        if metrics:
+            total_orden_str = f"${int(metrics['total_orden_clp']):,}".replace(",", ".")
+            ahorro_mensual_str = f"${int(metrics['ahorro_mensual_clp']):,}".replace(",", ".")
             story.append(Paragraph(
-                f"<b>Prevención de Mermas:</b> Comprar este volumen proyectado previene aprox. "
-                f"<b>{waste_metrics['kg_ahorro_merma']} kg</b> de desperdicio por caducidad "
-                f"y protege un estimado de <b>{ahorro_str} CLP</b> en Food Cost.",
-                alert_style
+                f"<b>Costo Total de la Orden:</b> {total_orden_str} CLP &nbsp;&nbsp;|&nbsp;&nbsp; "
+                f"<b>Ahorro Estimado Mensual en Mermas:</b> {ahorro_mensual_str} CLP",
+                kpi_style
             ))
 
-        story.append(Spacer(1, 8))
+        story.append(Spacer(1, 4))
 
-        # Tabla de compras
+        # Tabla de compras y costeo
         table_data = [[
             Paragraph("<b>Insumo Perecible</b>", styles['Normal']),
-            Paragraph("<b>Consumo Base</b>", styles['Normal']),
-            Paragraph(f"<b>Margen (+{safety_margin_pct}%)</b>", styles['Normal']),
-            Paragraph("<b>Total Sugerido</b>", styles['Normal']),
+            Paragraph("<b>Cant. Sugerida</b>", styles['Normal']),
             Paragraph("<b>Unidad</b>", styles['Normal']),
-            Paragraph("<b>Riesgo Caducidad</b>", styles['Normal'])
+            Paragraph("<b>Precio ($ CLP)</b>", styles['Normal']),
+            Paragraph("<b>Subtotal ($ CLP)</b>", styles['Normal']),
+            Paragraph("<b>Riesgo</b>", styles['Normal'])
         ]]
 
         for _, row in shopping_df.iterrows():
+            cost_u = row.get('cost_per_unit', 0.0)
+            sub_c = row.get('subtotal_cost_clp', 0.0)
+            precio_unit_str = f"${int(cost_u):,}".replace(",", ".") if cost_u > 0 else "-"
+            subtotal_str = f"${int(sub_c):,}".replace(",", ".") if sub_c > 0 else "-"
             table_data.append([
                 Paragraph(str(row["insumo"]), styles['Normal']),
-                f"{row['consumo_base']:.2f}",
-                f"{row['margen_seguridad']:.2f}",
-                f"<b>{row['total_sugerido']:.2f}</b>",
+                f"{row['total_sugerido']:.2f}",
                 str(row["unidad"]),
+                precio_unit_str,
+                f"<b>{subtotal_str}</b>",
                 str(row.get("riesgo_caducidad", "MEDIO"))
             ])
 
-        col_widths = [190, 70, 80, 80, 50, 70]
+        # Fila de Total General
+        if metrics:
+            tot_str = f"${int(metrics['total_orden_clp']):,}".replace(",", ".")
+            table_data.append([
+                Paragraph("<b>TOTAL ORDEN DE COMPRA</b>", styles['Normal']),
+                "", "", "",
+                Paragraph(f"<b>{tot_str} CLP</b>", styles['Normal']),
+                ""
+            ])
+
+        col_widths = [185, 75, 50, 80, 95, 55]
         report_table = Table(table_data, colWidths=col_widths, repeatRows=1)
         report_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#F8FAFC")),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#0F172A")),
-            ('ALIGN', (1, 0), (3, -1), 'RIGHT'),
-            ('ALIGN', (4, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('ALIGN', (2, 0), (2, -1), 'CENTER'),
+            ('ALIGN', (3, 0), (4, -1), 'RIGHT'),
+            ('ALIGN', (5, 0), (5, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+            ('TOPPADDING', (0, 0), (-1, -1), 5),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor("#E2E8F0")),
         ]))
 
         story.append(report_table)
@@ -320,7 +334,7 @@ class ProcurementService:
             alignment=1
         )
         story.append(Paragraph(
-            "Documento generado automáticamente por GastroMerma Chile - Inteligencia de Compras para Restaurantes Independientes.",
+            f"Documento generado por {APP_NAME} | {APP_TAGLINE} - Santiago de Chile 🇨🇱",
             footer_style
         ))
 
@@ -329,7 +343,7 @@ class ProcurementService:
         return buffer.getvalue()
 
     def export_to_excel_bytes(self, shopping_df: pd.DataFrame, periodo_label: str) -> bytes:
-        """Exporta la lista de compras sugerida a un archivo Excel (.xlsx) en memoria."""
+        """Exporta la lista de compras sugerida y costeo a un archivo Excel (.xlsx) bajo la marca EZtock."""
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
             export_df = shopping_df.rename(columns={
@@ -338,9 +352,11 @@ class ProcurementService:
                 "margen_seguridad": "Margen Seguridad (+15%)",
                 "total_sugerido": "Total Sugerido Compra",
                 "unidad": "Unidad de Compra",
-                "riesgo_caducidad": "Nivel de Riesgo Caducidad",
+                "cost_per_unit": "Precio Compra ($ CLP)",
+                "subtotal_cost_clp": "Subtotal ($ CLP)",
+                "riesgo_caducidad": "Riesgo de Caducidad",
                 "platos_asociados": "Platos que lo Utilizan"
             })
-            export_df.to_excel(writer, index=False, sheet_name="Lista de Compras")
+            export_df.to_excel(writer, index=False, sheet_name="Orden EZtock")
         output.seek(0)
         return output.getvalue()

@@ -1,6 +1,11 @@
-"""Configuración general y constantes de la plataforma SaaS de reducción de mermas."""
+"""Configuración general y constantes de la plataforma SaaS EZtock."""
 
 from pathlib import Path
+
+# Identidad de Marca
+APP_NAME = "EZtock"
+APP_TAGLINE = "Control Inteligente de Stock y Costos Gastronómicos"
+APP_VERSION = "1.0.0"
 
 # Rutas de almacenamiento y datos
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,8 +15,33 @@ ACTIVE_RECIPES_PATH = DATA_DIR / "recipes.json"
 SAMPLE_POS_PATH = DATA_DIR / "sample_pos_sales.csv"
 
 # Parámetros del motor de proyección
-DEFAULT_SAFETY_MARGIN = 0.15  # 15% margen de seguridad por defecto
-FORECAST_DAYS_HORIZON = 7     # Próximos 7 días de horizonte de proyección
+DEFAULT_SAFETY_MARGIN = 0.15  # 15% margen de seguridad recomendado
+FORECAST_DAYS_HORIZON = 7     # 7 días horizonte de proyección
+
+# Precios referenciales de compra en ferias mayoristas de Chile (CLP)
+DEFAULT_INGREDIENT_PRICES_CLP = {
+    "pescado blanco": 9500,     # Reineta / Corvina fresca por kg
+    "reineta": 9500,
+    "salmón": 14000,            # Filete salmón fresco por kg
+    "salmon": 14000,
+    "lomo": 9800,               # Lomo liso vacuno por kg
+    "vacuno": 9800,
+    "posta": 8800,              # Posta vacuno por kg
+    "pollo": 4800,              # Pechuga de pollo por kg
+    "atún": 13500,              # Atún fresco por kg
+    "machas": 8500,             # Machas frescas por kg
+    "cebolla": 1200,            # Cebolla morada por kg
+    "limón": 1800,              # Limón sutil por malla / kg
+    "limon": 1800,
+    "palta": 4500,              # Palta Hass por kg
+    "choclo": 2200,             # Pasta de choclo por kg
+    "tomate": 1500,             # Tomate por kg
+    "espárrago": 4200,          # Espárragos por kg
+    "esparrago": 4200,
+    "zapallo": 1400,            # Zapallo camote por kg
+    "queso": 8900,              # Queso parmesano por kg
+    "default": 6500             # Costo base referencial por kg o un
+}
 
 # Días de la semana en español (orden estándar ISO: 0 = Lunes, 6 = Domingo)
 DAYS_OF_WEEK_ES = {

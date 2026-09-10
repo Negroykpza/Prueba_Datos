@@ -3,23 +3,36 @@
 from dataclasses import dataclass, field, asdict
 from datetime import date
 from typing import List, Dict, Any, Optional
-from src.config import UNIT_CONVERSION_FACTORS
+from src.config import UNIT_CONVERSION_FACTORS, DEFAULT_INGREDIENT_PRICES_CLP
 
 
 @dataclass
 class IngredientRequirement:
-    """Representa el requerimiento de un insumo perecible dentro de un escandallo."""
+    """Representa el requerimiento de un insumo perecible dentro de un escandallo con su costo en CLP."""
     ingredient_name: str
     quantity_per_dish: float
-    recipe_unit: str = "g"        # 'g', 'ml', 'un'
-    purchase_unit: str = "kg"     # 'kg', 'L', 'un'
-    conversion_factor: float = 0.001  # factor para convertir recipe_unit a purchase_unit
+    recipe_unit: str = "g"              # 'g', 'ml', 'un'
+    purchase_unit: str = "kg"           # 'kg', 'L', 'un'
+    conversion_factor: float = 0.001    # factor para convertir recipe_unit a purchase_unit
+    cost_per_unit: float = 0.0          # Precio de compra por kilo o unidad en pesos chilenos ($ CLP)
 
     def __post_init__(self):
         # Autoasignar factor de conversión estándar si no se especificó uno personalizado
         key = (self.recipe_unit.lower(), self.purchase_unit.lower())
         if key in UNIT_CONVERSION_FACTORS and self.conversion_factor == 0.001 and key != ("g", "kg"):
             self.conversion_factor = UNIT_CONVERSION_FACTORS[key]
+
+        # Autoasignar precio referencial en CLP si viene en 0.0
+        if self.cost_per_unit == 0.0:
+            name_lower = self.ingredient_name.lower()
+            assigned = False
+            for k, price in DEFAULT_INGREDIENT_PRICES_CLP.items():
+                if k in name_lower:
+                    self.cost_per_unit = float(price)
+                    assigned = True
+                    break
+            if not assigned:
+                self.cost_per_unit = float(DEFAULT_INGREDIENT_PRICES_CLP["default"])
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -31,7 +44,8 @@ class IngredientRequirement:
             quantity_per_dish=float(data["quantity_per_dish"]),
             recipe_unit=str(data.get("recipe_unit", "g")),
             purchase_unit=str(data.get("purchase_unit", "kg")),
-            conversion_factor=float(data.get("conversion_factor", 0.001))
+            conversion_factor=float(data.get("conversion_factor", 0.001)),
+            cost_per_unit=float(data.get("cost_per_unit", 0.0))
         )
 
 
@@ -86,10 +100,12 @@ class DishForecast:
 
 @dataclass
 class ProcurementItem:
-    """Línea de la lista de compras sugerida para un insumo perecible."""
+    """Línea de la lista de compras sugerida para un insumo perecible con costeo en CLP."""
     ingredient_name: str
     consumo_base: float
     margen_seguridad: float
     total_sugerido: float
     unidad_compra: str
+    cost_per_unit: float = 0.0
+    costo_total_sugerido: float = 0.0
     platos_asociados: List[str] = field(default_factory=list)

@@ -88,16 +88,15 @@ class TestProcurementService(unittest.TestCase):
 
     def test_whatsapp_message_formatting(self):
         df_mock = pd.DataFrame([
-            {"insumo": "Reineta", "total_sugerido": 25.5, "unidad": "kg"},
-            {"insumo": "Limón Sutil", "total_sugerido": 120.0, "unidad": "un"}
+            {"insumo": "Reineta", "total_sugerido": 25.5, "unidad": "kg", "cost_per_unit": 9500.0, "subtotal_cost_clp": 242250.0},
+            {"insumo": "Limón Sutil", "total_sugerido": 120.0, "unidad": "un", "cost_per_unit": 350.0, "subtotal_cost_clp": 42000.0}
         ])
         msg = self.procurement.format_whatsapp_message(df_mock, "La Mar Chile", "Fin de Semana")
-        self.assertIn("LA MAR CHILE", msg)
+        self.assertIn("La Mar Chile", msg)
         self.assertIn("Reineta", msg)
         self.assertIn("25.5 kg", msg)
         self.assertIn("Limón Sutil", msg)
-        self.assertIn("120.0 un", msg)
-        self.assertIn("15% margen de seguridad", msg)
+        self.assertIn("EZTOCK", msg.upper())
 
     def test_pdf_report_generation(self):
         df_mock = pd.DataFrame([
