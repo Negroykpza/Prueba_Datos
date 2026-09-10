@@ -4,7 +4,7 @@
 
 ---
 
-## 🎯 Problema de Negocio en Chile
+##  Problema de Negocio en Chile
 
 En el rubro gastronómico independiente chileno:
 - Las mermas por alimentos vencidos o descompuestos (especialmente pescados, mariscos, carnes y verduras frescas) representan entre el **4% y 8% del Food Cost**.
@@ -14,7 +14,7 @@ En el rubro gastronómico independiente chileno:
 
 ---
 
-## 🏗️ Arquitectura Modular del Proyecto
+##  Arquitectura Modular del Proyecto
 
 ```text
 TRABAJO_EMPRENDIMIENTO/
@@ -52,7 +52,7 @@ TRABAJO_EMPRENDIMIENTO/
 
 ---
 
-## 🚀 Funcionalidades Principales
+##  Funcionalidades Principales
 
 ### 1. Ingesta Resiliente de Ventas POS (`src/services/pos_parser.py`)
 - Detección automática de delimitador (`,` o `;`) y codificación (`UTF-8` o `Latin-1`).
@@ -79,12 +79,12 @@ TRABAJO_EMPRENDIMIENTO/
 - Filtro especializado para **Fin de Semana (Viernes, Sábado y Domingo)**, el período de mayor riesgo de merma.
 - Muestra el total a comprar expresado en unidades comerciales (**kg**, **litros** o **unidades**).
 - **Exportación operativa**:
-  - 📲 **WhatsApp para Proveedores**: Texto formateado con emojis listo para copiar y enviar a distribuidores.
-  - 📊 **Excel (.xlsx)** y **CSV (.csv)** para el equipo de compras y administración.
+  -  **WhatsApp para Proveedores**: Texto formateado con emojis listo para copiar y enviar a distribuidores.
+  -  **Excel (.xlsx)** y **CSV (.csv)** para el equipo de compras y administración.
 
 ---
 
-## 💻 Instalación y Ejecución Local
+##  Instalación y Ejecución Local
 
 ### Prerrequisitos
 - Python 3.9 o superior instalado.
@@ -116,7 +116,7 @@ La aplicación se abrirá automáticamente en tu navegador en `http://localhost:
 
 ---
 
-## 🧪 Ejecución de Pruebas Unitarias
+##  Ejecución de Pruebas Unitarias
 
 Para validar la integridad de los cálculos y servicios:
 ```bash
