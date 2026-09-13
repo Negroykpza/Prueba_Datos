@@ -284,6 +284,7 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
         col_spacer, col_cta = st.columns([1.5, 1])
         with col_cta:
             if st.button("Continuar al Editor de Escandallos ($ CLP) ➡️", type="primary", use_container_width=True):
+                st.session_state["active_tab"] = "🥗 2. Editor de Escandallos ($ CLP)"
                 st.session_state["selected_tab_name"] = "🥗 2. Editor de Escandallos ($ CLP)"
                 st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)

@@ -29,6 +29,8 @@ TAB_OPTIONS = [
 
 def init_app_state():
     """Inicializa variables en el estado de sesión si no existen."""
+    if "active_tab" not in st.session_state:
+        st.session_state["active_tab"] = TAB_OPTIONS[0]
     if "selected_tab_name" not in st.session_state:
         st.session_state["selected_tab_name"] = TAB_OPTIONS[0]
     if "sales_df" not in st.session_state:
@@ -112,23 +114,23 @@ def main():
             unsafe_allow_html=True
         )
 
-    # Navegación Interactiva por Pestañas (con soporte de navegación fluida mediante botones CTA)
-    current_index = TAB_OPTIONS.index(st.session_state["selected_tab_name"]) if st.session_state["selected_tab_name"] in TAB_OPTIONS else 0
+    # Navegación Interactiva por Pestañas (sincronización directa mediante key='active_tab')
+    if "active_tab" not in st.session_state or st.session_state["active_tab"] not in TAB_OPTIONS:
+        st.session_state["active_tab"] = TAB_OPTIONS[0]
 
     selected_tab = st.radio(
         "Navegación de Módulos:",
         options=TAB_OPTIONS,
-        index=current_index,
+        key="active_tab",
         horizontal=True,
         label_visibility="collapsed"
     )
 
-    # Sincronizar estado si el usuario hizo clic en las opciones superiores
-    if selected_tab != st.session_state["selected_tab_name"]:
-        st.session_state["selected_tab_name"] = selected_tab
+    # Mantener sincronizado selected_tab_name para compatibilidad
+    st.session_state["selected_tab_name"] = selected_tab
 
     # Renderizado condicional según la pestaña activa
-    active_tab = st.session_state["selected_tab_name"]
+    active_tab = selected_tab
 
     if active_tab == TAB_OPTIONS[0]:
         render_pos_view(pos_parser, recipe_service)

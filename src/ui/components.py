@@ -262,6 +262,9 @@ def inject_custom_styles():
     """, unsafe_allow_html=True)
 
 
+import textwrap
+
+
 def render_metric_card(
     title: str,
     value: str,
@@ -284,7 +287,7 @@ def render_metric_card(
     delta_html = f'<span class="delta-pill {delta_class}">{delta}</span>' if delta else ""
     caption_html = f'<div class="metric-caption-text">{caption}</div>' if caption else ""
 
-    st.markdown(f"""
+    html_card = textwrap.dedent(f"""
         <div class="metric-card-container">
             <div class="metric-header-row">
                 <span class="metric-title-text">{title}</span>
@@ -293,7 +296,8 @@ def render_metric_card(
             <div class="metric-value-text">{value}</div>
             {caption_html}
         </div>
-    """, unsafe_allow_html=True)
+    """).strip()
+    st.markdown(html_card, unsafe_allow_html=True)
 
 
 def render_financial_hero_card(
@@ -305,7 +309,7 @@ def render_financial_hero_card(
 ):
     """Renderiza una tarjeta héroe financiero en Dark Mode con énfasis visual."""
     badge_html = f'<span class="delta-pill delta-positive" style="color: {accent_color}; border-color: {accent_color}55;">{badge_text}</span>' if badge_text else ""
-    st.markdown(f"""
+    html_hero = textwrap.dedent(f"""
         <div class="financial-hero-card" style="border-top: 3px solid {accent_color};">
             <div class="financial-hero-top">
                 <span class="financial-hero-title">{title}</span>
@@ -314,13 +318,16 @@ def render_financial_hero_card(
             <div class="financial-hero-value" style="color: {accent_color};">{value}</div>
             <div class="financial-hero-caption">{caption}</div>
         </div>
-    """, unsafe_allow_html=True)
+    """).strip()
+    st.markdown(html_hero, unsafe_allow_html=True)
 
 
 def render_info_banner(title: str, message: str):
     """Renderiza un banner informativo tipo recomendación culinaria en Dark Mode."""
-    st.markdown(f"""
+    html_banner = textwrap.dedent(f"""
         <div class="banner-tip-dark">
             <strong>{title}</strong><br>{message}
         </div>
-    """, unsafe_allow_html=True)
+    """).strip()
+    st.markdown(html_banner, unsafe_allow_html=True)
+

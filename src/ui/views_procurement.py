@@ -1,13 +1,14 @@
 """Vista 3: Dashboard Financiero EZtock, Métricas Primarias, Alertas Operativas y Análisis de Costos ($ CLP)."""
 
 from datetime import timedelta
+import textwrap
 import plotly.graph_objects as go
 import streamlit as st
 import pandas as pd
 from src.services.forecasting import ForecastingEngine
 from src.services.procurement import ProcurementService
-from src.config import APP_NAME, APP_TAGLINE
-from src.ui.components import render_financial_hero_card, render_info_banner
+from src.config import APP_NAME
+from src.ui.components import render_financial_hero_card
 
 
 def render_financial_dashboard_view(
@@ -157,7 +158,7 @@ def render_financial_dashboard_view(
 
     st.markdown("---")
 
-    # 5. Alertas Operativas y Decisiones Inmediatas en Dark Mode
+    # 5. Alertas Operativas con Componentes Nativos de Streamlit (Zero Fugas de HTML)
     st.subheader("⚡ Alertas Operativas y Puntos de Fuga")
     st.markdown(
         "<span style='font-size: 0.92rem; color: #94A3B8;'>Decisiones operativas inmediatas para cuidar el flujo de caja y evitar botar materias primas a la basura.</span>",
@@ -168,84 +169,62 @@ def render_financial_dashboard_view(
 
     # Tarjeta 1: 🔴 Frena Compras (Sobrestock en Bodega)
     with col_alert_frena:
-        frena_items_html = ""
-        for item in alerts["frena_compras"]:
-            frena_items_html += f"""
-                <div class="alert-item-box">
-                    <div style="font-weight: 700; color: #F87171; font-size: 0.92rem;">
-                        🛑 {item['insumo']}
-                    </div>
-                    <div style="font-size: 0.84rem; color: #CBD5E1; margin-top: 3px; line-height: 1.4;">
-                        {item['motivo']}
-                    </div>
-                    <div style="font-size: 0.78rem; font-weight: 600; color: #34D399; margin-top: 4px;">
-                        💰 Flujo de caja retenido: {item['ahorro_estimado']}
-                    </div>
-                </div>
-            """
+        with st.container(border=True):
+            col_h1, col_h2 = st.columns([2.8, 1.4])
+            with col_h1:
+                st.markdown("##### 🛑 Frena Compras (Sobrestock)")
+            with col_h2:
+                st.markdown(
+                    '<span class="delta-pill delta-negative" style="float: right;">PAUSAR PEDIDOS</span>',
+                    unsafe_allow_html=True
+                )
 
-        st.markdown(f"""
-            <div class="alert-card-dark alert-card-danger" style="min-height: 290px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-size: 1.05rem; font-weight: 800; color: #FCA5A5;">
-                        🔴 Frena Compras (Sobrestock en Bodega)
-                    </span>
-                    <span class="delta-pill delta-negative">
-                        PAUSAR PEDIDOS
-                    </span>
-                </div>
-                <div style="font-size: 0.85rem; color: #FECACA; margin-bottom: 12px;">
-                    Insumos con cobertura garantizada en bodega. <strong>Evita compras impulsivas</strong> que inmovilicen dinero:
-                </div>
-                {frena_items_html}
-            </div>
-        """, unsafe_allow_html=True)
+            st.caption("Insumos con cobertura garantizada en bodega. **Evita compras impulsivas** que inmovilicen dinero:")
+
+            frena_items = alerts.get("frena_compras", [])
+            if frena_items:
+                for item in frena_items:
+                    with st.container(border=True):
+                        st.markdown(f"**🛑 {item['insumo']}**")
+                        st.write(item["motivo"])
+                        st.caption(f"💰 Flujo de caja retenido: **{item['ahorro_estimado']}**")
+            else:
+                st.info("No hay órdenes que requieran pausa en este ciclo.")
 
     # Tarjeta 2: 🟡 Promoción Preventiva (Venta Acelerada de Perecibles < 48h)
     with col_alert_promo:
-        promo_items_html = ""
-        for item in alerts["promociones"]:
-            promo_items_html += f"""
-                <div class="alert-item-box">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 700; color: #FBBF24; font-size: 0.92rem;">
-                            🍽️ {item['insumo']}
-                        </span>
-                        <span style="font-size: 0.75rem; color: #FDE68A; font-weight: 600;">
-                            ⏳ {item['caducidad']}
-                        </span>
-                    </div>
-                    <div style="font-size: 0.84rem; font-weight: 600; color: #F8FAFC; margin-top: 4px;">
-                        📌 {item['plato_sugerido']}
-                    </div>
-                    <div style="font-size: 0.80rem; color: #CBD5E1; margin-top: 2px; line-height: 1.35;">
-                        💡 {item['estrategia']}
-                    </div>
-                </div>
-            """
+        with st.container(border=True):
+            col_h1, col_h2 = st.columns([2.8, 1.4])
+            with col_h1:
+                st.markdown("##### 🟡 Promoción Preventiva (Menú)")
+            with col_h2:
+                st.markdown(
+                    '<span class="delta-pill delta-warning" style="float: right;">VENTA ACELERADA</span>',
+                    unsafe_allow_html=True
+                )
 
-        st.markdown(f"""
-            <div class="alert-card-dark alert-card-warning" style="min-height: 290px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-size: 1.05rem; font-weight: 800; color: #FDE68A;">
-                        🟡 Promoción Preventiva (Menú del Día)
-                    </span>
-                    <span class="delta-pill delta-warning">
-                        VENTA ACELERADA
-                    </span>
-                </div>
-                <div style="font-size: 0.85rem; color: #FEF3C7; margin-bottom: 12px;">
-                    Insumos perecibles críticos (&lt; 48h). <strong>Saca estos platos a la carta hoy</strong> para asegurar su rotación:
-                </div>
-                {promo_items_html}
-            </div>
-        """, unsafe_allow_html=True)
+            st.caption("Insumos perecibles críticos (< 48h). **Saca estos platos a la carta hoy** para asegurar su rotación:")
+
+            promo_items = alerts.get("promociones", [])
+            if promo_items:
+                for item in promo_items:
+                    with st.container(border=True):
+                        col_p1, col_p2 = st.columns([3, 1.8])
+                        with col_p1:
+                            st.markdown(f"**🍽️ {item['insumo']}**")
+                        with col_p2:
+                            st.caption(f"⏳ {item['caducidad']}")
+                        st.markdown(f"📌 **Sugerencia:** *{item['plato_sugerido']}*")
+                        st.write(f"💡 {item['estrategia']}")
+            else:
+                st.info("Sin alertas críticas de caducidad en el lote proyectado.")
 
     # Botón CTA hacia la Pestaña 4
     st.markdown('<div class="cta-container">', unsafe_allow_html=True)
     col_spacer, col_cta = st.columns([1.4, 1.1])
     with col_cta:
         if st.button("Generar Órdenes por Proveedor y Enviar WhatsApp ➡️", type="primary", use_container_width=True):
+            st.session_state["active_tab"] = "🚚 4. Mis Proveedores (Compras & WhatsApp)"
             st.session_state["selected_tab_name"] = "🚚 4. Mis Proveedores (Compras & WhatsApp)"
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)

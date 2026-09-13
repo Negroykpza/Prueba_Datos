@@ -49,40 +49,34 @@ def render_suppliers_view(
         st.error("No se encontraron insumos para abastecer. Configura los escandallos en la Pestaña 2.")
         return
 
-    # Resumen superior de proveedores en Dark Mode
+    # Resumen superior de proveedores con componentes nativos
     proveedores_unicos = sorted(shopping_df["proveedor"].unique())
     total_general = int(shopping_df["subtotal_cost_clp"].sum())
     total_general_str = f"${total_general:,}".replace(",", ".")
 
-    st.markdown(f"""
-        <div style="background-color: #1E293B; border: 1px solid #334155; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);">
-            <span style="font-size: 0.95rem; color: #CBD5E1;">
-                📦 <strong>Resumen de Abastecimiento:</strong> <span style="color: #38BDF8; font-weight: 700;">{len(proveedores_unicos)} proveedores activos</span> | 
-                💰 <strong>Inversión Total:</strong> <span style="color: #34D399; font-weight: 800; font-size: 1.05rem;">{total_general_str} CLP</span> |
-                📅 <strong>Período:</strong> <span style="color: #F8FAFC;">{periodo_label}</span>
-            </span>
-        </div>
-    """, unsafe_allow_html=True)
+    with st.container(border=True):
+        col_res1, col_res2, col_res3 = st.columns(3)
+        with col_res1:
+            st.metric("📦 Proveedores Activos", f"{len(proveedores_unicos)} distribuidores")
+        with col_res2:
+            st.metric("💰 Inversión Total Pedido", f"{total_general_str} CLP")
+        with col_res3:
+            st.metric("📅 Período de Entrega", periodo_label)
 
-    # Iterar sobre cada proveedor de forma independiente
+    # Iterar sobre cada proveedor de forma independiente con tarjetas nativas
     for idx, prov in enumerate(proveedores_unicos):
         prov_df = shopping_df[shopping_df["proveedor"] == prov].copy()
         prov_subtotal = int(prov_df["subtotal_cost_clp"].sum())
         prov_subtotal_str = f"${prov_subtotal:,}".replace(",", ".")
         prov_slug = prov.split()[0].replace("🐟", "pesca").replace("🥩", "carne").replace("🥬", "vega").replace("🧀", "lacteo").replace("🏪", "gral")
 
-        with st.container():
-            st.markdown(f"""
-                <div style="display: flex; justify-content: space-between; align-items: center; background: #1E293B; border: 1px solid #334155; border-left: 5px solid #38BDF8; border-radius: 10px; padding: 14px 20px; margin-top: 16px; margin-bottom: 10px;">
-                    <div>
-                        <span style="font-size: 1.15rem; font-weight: 800; color: #F8FAFC;">{prov}</span>
-                        <span style="font-size: 0.85rem; color: #94A3B8; margin-left: 10px;">({len(prov_df)} insumos)</span>
-                    </div>
-                    <div style="font-size: 1.15rem; font-weight: 800; color: #34D399;">
-                        Subtotal: {prov_subtotal_str} CLP
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
+        with st.container(border=True):
+            col_header1, col_header2 = st.columns([3, 1.5])
+            with col_header1:
+                st.markdown(f"### {prov}")
+                st.caption(f"{len(prov_df)} materias primas requeridas")
+            with col_header2:
+                st.metric("Subtotal Proveedor", f"{prov_subtotal_str} CLP")
 
             # Tabla de compras por proveedor
             display_prov_df = prov_df.copy().rename(columns={
@@ -132,8 +126,6 @@ def render_suppliers_view(
 
             with st.expander(f"👁️ Ver mensaje formateado para {prov}", expanded=st.session_state.get(f"show_wa_{idx}", False)):
                 st.code(wa_text_prov, language="text")
-
-        st.markdown("<div style='margin-bottom: 16px;'></div>", unsafe_allow_html=True)
 
     st.markdown("---")
 

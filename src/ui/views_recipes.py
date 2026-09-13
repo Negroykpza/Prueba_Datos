@@ -144,6 +144,7 @@ def render_recipes_view(recipe_service: RecipeService):
     col_spacer, col_cta = st.columns([1.5, 1])
     with col_cta:
         if st.button("Continuar a Dashboard Financiero & Fugas ($ CLP) ➡️", type="primary", use_container_width=True):
+            st.session_state["active_tab"] = "💰 3. Dashboard Financiero & Fugas"
             st.session_state["selected_tab_name"] = "💰 3. Dashboard Financiero & Fugas"
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
