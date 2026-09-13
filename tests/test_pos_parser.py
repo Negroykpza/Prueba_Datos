@@ -2,6 +2,7 @@
 
 import unittest
 from datetime import date
+import pandas as pd
 from src.services.pos_parser import POSParser
 
 
@@ -46,6 +47,42 @@ class TestPOSParser(unittest.TestCase):
         self.assertEqual(len(df), 1)
         self.assertEqual(df.iloc[0]["plato"], "Salmón Grillé")
         self.assertEqual(df.iloc[0]["cantidad"], 8.0)
+
+    def test_load_demo_data(self):
+        df = self.parser.load_demo_data()
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertFalse(df.empty)
+        self.assertIn("fecha", df.columns)
+        self.assertIn("plato", df.columns)
+        self.assertIn("cantidad", df.columns)
+        self.assertGreater(len(df), 50)
+
+    def test_parse_csv(self):
+        csv_bytes = b"Fecha,Plato,Cantidad\n01/08/2026,Ceviche Mixto,10\n"
+        df = self.parser.parse_csv(csv_bytes)
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertEqual(len(df), 1)
+        self.assertEqual(df.iloc[0]["plato"], "Ceviche Mixto")
+
+    def test_extract_unique_dishes(self):
+        df = pd.DataFrame([
+            {"plato": "Lomo Saltado", "cantidad": 5},
+            {"plato": "Ceviche Mixto", "cantidad": 3},
+            {"plato": "Lomo Saltado", "cantidad": 2}
+        ])
+        dishes = self.parser.extract_unique_dishes(df)
+        self.assertEqual(dishes, ["Ceviche Mixto", "Lomo Saltado"])
+
+    def test_get_summary(self):
+        df = pd.DataFrame([
+            {"fecha": date(2026, 8, 1), "plato": "Ceviche Mixto", "cantidad": 10.0, "dia_semana_num": 5},
+            {"fecha": date(2026, 8, 2), "plato": "Lomo Saltado", "cantidad": 20.0, "dia_semana_num": 6},
+        ])
+        summary = self.parser.get_summary(df)
+        self.assertEqual(summary["total_unidades"], 30)
+        self.assertEqual(summary["total_platos"], 2)
+        self.assertEqual(summary["dias_totales"], 2)
+        self.assertEqual(summary["pct_fin_semana"], 100.0)
 
 
 if __name__ == "__main__":

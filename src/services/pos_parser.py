@@ -2,7 +2,7 @@
 
 import io
 import re
-from typing import Dict, Optional, Tuple, Any, Union
+from typing import Dict, Optional, Tuple, Any, Union, List
 from pathlib import Path
 import pandas as pd
 from src.config import POS_COLUMN_ALIASES, DAYS_OF_WEEK_ES
@@ -78,7 +78,7 @@ class POSParser:
                 sep=delimiter,
                 engine="python"
             )
-        except Exception as e:
+        except Exception:
             # Fallback en caso de problemas con el delimitador detectado
             df = pd.read_csv(
                 io.BytesIO(file_bytes),
@@ -99,6 +99,149 @@ class POSParser:
         with open(path, "rb") as f:
             file_bytes = f.read()
         return self.load_from_bytes(file_bytes, custom_mapping)
+
+    def parse_csv(
+        self,
+        file_source: Any,
+        custom_mapping: Optional[Dict[str, str]] = None
+    ) -> pd.DataFrame:
+        """
+        Lee y procesa un archivo CSV desde un Streamlit UploadedFile, bytes, o ruta de archivo.
+        Retorna el DataFrame normalizado.
+        """
+        if hasattr(file_source, "getvalue"):
+            file_bytes = file_source.getvalue()
+        elif isinstance(file_source, bytes):
+            file_bytes = file_source
+        elif hasattr(file_source, "read"):
+            file_bytes = file_source.read()
+        elif isinstance(file_source, (str, Path)):
+            with open(file_source, "rb") as f:
+                file_bytes = f.read()
+        else:
+            raise TypeError(f"Tipo de origen no soportado para parse_csv: {type(file_source)}")
+
+        df, _ = self.load_from_bytes(file_bytes, custom_mapping)
+        return df
+
+    def load_demo_data(self) -> pd.DataFrame:
+        """
+        Carga el conjunto de datos de demostración de 90 días de ventas POS.
+        Busca en disco (data/sample_pos_sales.csv o data/ventas_pos_90dias.csv)
+        y si no existe, genera una muestra sintética en memoria.
+        """
+        possible_paths = [
+            Path("data/sample_pos_sales.csv"),
+            Path(__file__).resolve().parent.parent.parent / "data" / "sample_pos_sales.csv",
+            Path("data/ventas_pos_90dias.csv"),
+            Path(__file__).resolve().parent.parent.parent / "data" / "ventas_pos_90dias.csv",
+        ]
+
+        for p in possible_paths:
+            if p.exists() and p.is_file():
+                try:
+                    df, _ = self.load_from_path(p)
+                    if not df.empty:
+                        return df
+                except Exception:
+                    continue
+
+        return self._generate_synthetic_demo_data()
+
+    def _generate_synthetic_demo_data(self) -> pd.DataFrame:
+        """Genera 90 días de ventas sintéticas para restaurantes chilenos en caso de que no exista el archivo en disco."""
+        import random
+        from datetime import date, timedelta
+
+        end_date = date.today()
+        start_date = end_date - timedelta(days=90)
+
+        dishes = [
+            ("Ceviche Mixto", 18, 35),
+            ("Ceviche Clásico", 15, 30),
+            ("Lomo Saltado", 16, 32),
+            ("Pastel de Choclo", 12, 28),
+            ("Salmón Grillé", 10, 22),
+            ("Tartar de Atún", 8, 18),
+            ("Empanada de Pino", 25, 55),
+            ("Machas a la Parmesana", 12, 28),
+            ("Cazuela de Vacuno", 10, 22)
+        ]
+
+        rows = []
+        cur = start_date
+        # Semilla fija para reproducibilidad
+        rng = random.Random(42)
+        while cur <= end_date:
+            is_weekend = cur.weekday() in [4, 5, 6]  # Viernes, Sábado, Domingo
+            multiplier = 1.5 if is_weekend else 1.0
+            for dish, base_min, base_max in dishes:
+                qty = int(rng.randint(base_min, base_max) * multiplier)
+                rows.append({
+                    "Fecha": cur.strftime("%d/%m/%Y"),
+                    "Plato": dish,
+                    "Cantidad": qty
+                })
+            cur += timedelta(days=1)
+
+        raw_df = pd.DataFrame(rows)
+        df, _ = self.process_dataframe(raw_df)
+        return df
+
+    def extract_unique_dishes(self, df: Optional[pd.DataFrame] = None) -> List[str]:
+        """Extrae la lista ordenada de nombres únicos de platos de un DataFrame de ventas."""
+        target_df = df if df is not None else self.cleaned_df
+        if target_df is None or target_df.empty or "plato" not in target_df.columns:
+            return []
+        return sorted(target_df["plato"].dropna().astype(str).unique().tolist())
+
+    def get_summary(self, df: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
+        """Calcula métricas estadísticas y de diagnóstico a partir del DataFrame de ventas."""
+        target_df = df if df is not None else self.cleaned_df
+        if target_df is None or target_df.empty:
+            return {
+                "total_unidades": 0,
+                "total_platos": 0,
+                "dias_totales": 0,
+                "pct_fin_semana": 0.0,
+                "rango_fechas": "N/A",
+                "fecha_inicio": None,
+                "fecha_fin": None,
+                "total_unidades_vendidas": 0.0,
+                "platos_unicos": 0,
+                "promedio_diario": 0.0
+            }
+
+        total_unidades = float(target_df["cantidad"].sum())
+        total_platos = int(target_df["plato"].nunique())
+        dias_totales = int(target_df["fecha"].nunique())
+
+        # Cálculo de ventas en fin de semana (Viernes=4, Sábado=5, Domingo=6)
+        if "dia_semana_num" in target_df.columns:
+            weekend_mask = target_df["dia_semana_num"].isin([4, 5, 6])
+        else:
+            weekend_mask = pd.to_datetime(target_df["fecha"]).dt.dayofweek.isin([4, 5, 6])
+
+        weekend_unidades = float(target_df[weekend_mask]["cantidad"].sum())
+        pct_fin_semana = (weekend_unidades / total_unidades * 100.0) if total_unidades > 0 else 0.0
+
+        min_fecha = target_df["fecha"].min()
+        max_fecha = target_df["fecha"].max()
+        rango_str = f"{min_fecha.strftime('%d/%m/%Y')} - {max_fecha.strftime('%d/%m/%Y')}" if hasattr(min_fecha, "strftime") else f"{min_fecha} - {max_fecha}"
+        promedio_diario = round(total_unidades / dias_totales, 1) if dias_totales > 0 else 0.0
+
+        return {
+            "total_unidades": int(total_unidades),
+            "total_platos": total_platos,
+            "dias_totales": dias_totales,
+            "pct_fin_semana": round(pct_fin_semana, 1),
+            "rango_fechas": rango_str,
+            "fecha_inicio": min_fecha,
+            "fecha_fin": max_fecha,
+            "total_unidades_vendidas": total_unidades,
+            "platos_unicos": total_platos,
+            "promedio_diario": promedio_diario
+        }
 
     def process_dataframe(
         self,
@@ -184,14 +327,8 @@ class POSParser:
         self.cleaned_df = aggregated
 
         # Metadatos del archivo procesado
-        summary = {
-            "total_filas_originales": len(df),
-            "total_registros_validos": len(aggregated),
-            "platos_unicos": int(aggregated["plato"].nunique()),
-            "fecha_inicio": aggregated["fecha"].min() if not aggregated.empty else None,
-            "fecha_fin": aggregated["fecha"].max() if not aggregated.empty else None,
-            "total_unidades_vendidas": float(aggregated["cantidad"].sum()),
-            "dias_totales": int(aggregated["fecha"].nunique())
-        }
+        summary = self.get_summary(aggregated)
+        summary["total_filas_originales"] = len(df)
+        summary["total_registros_validos"] = len(aggregated)
 
         return aggregated, summary
