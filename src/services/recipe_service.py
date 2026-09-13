@@ -60,6 +60,8 @@ class RecipeService:
 
     def get_recipe(self, dish_name: str) -> Optional[Recipe]:
         """Busca un escandallo por nombre de plato (búsqueda insensible a mayúsculas/minúsculas)."""
+        if not dish_name:
+            return None
         clean_name = dish_name.strip().lower()
         for name, recipe in self.recipes.items():
             if name.strip().lower() == clean_name:
@@ -92,82 +94,143 @@ class RecipeService:
         """Compara los platos que se venden en el POS con los escandallos configurados."""
         mapped = []
         unmapped = []
+        if not pos_dishes:
+            return mapped, unmapped
+
         for dish in pos_dishes:
-            if self.get_recipe(dish) is not None:
+            if dish and self.get_recipe(dish) is not None:
                 mapped.append(dish)
-            else:
+            elif dish:
                 unmapped.append(dish)
         return mapped, unmapped
 
-    def ensure_dishes_exist(self, detected_dishes: List[str]):
+    def sync_with_detected_dishes(self, detected_dishes: Optional[List[str]]):
         """
-        Asegura que todos los platos detectados dinámicamente en el CSV tengan
-        al menos una receta base para que aparezcan en el editor interactivo.
+        Sincroniza el catálogo de escandallos con los platos detectados en ventas POS.
+        Registra e inicializa únicamente aquellos platos que no tengan escandallo definido,
+        manejando listas vacías o valores nulos de forma robusta sin sobrescribir recetas existentes.
         """
+        if not detected_dishes:
+            return
+
         changes = False
         for dish in detected_dishes:
-            clean = dish.strip().title()
-            if not self.get_recipe(clean):
-                # Generar insumo sugerido con precio base
-                suggested_ing = "Insumo Perecible Principal"
-                default_price = float(DEFAULT_INGREDIENT_PRICES_CLP["default"])
-                
-                # Deducción inteligente de insumo común
-                dish_lower = clean.lower()
-                if "ceviche" in dish_lower or "pescado" in dish_lower or "reineta" in dish_lower:
-                    suggested_ing = "Pescado Blanco Fresco (Reineta)"
-                    default_price = 9500.0
-                elif "salmón" in dish_lower or "salmon" in dish_lower:
-                    suggested_ing = "Filete de Salmón Fresco"
-                    default_price = 14000.0
-                elif "lomo" in dish_lower or "carne" in dish_lower or "vacuno" in dish_lower:
-                    suggested_ing = "Lomo Liso Vacuno"
-                    default_price = 9800.0
-                elif "pollo" in dish_lower:
-                    suggested_ing = "Pechuga de Pollo"
-                    default_price = 4800.0
+            if not dish or not str(dish).strip():
+                continue
 
-                new_rec = Recipe(
-                    dish_name=clean,
-                    categoria="Carta General",
-                    ingredients=[
-                        IngredientRequirement(
-                            ingredient_name=suggested_ing,
-                            quantity_per_dish=180.0,
-                            recipe_unit="g",
-                            purchase_unit="kg",
-                            conversion_factor=0.001,
-                            cost_per_unit=default_price
-                        )
-                    ]
-                )
-                self.recipes[clean] = new_rec
-                changes = True
+            clean = str(dish).strip().title()
+
+            # Evitar sobrescribir recetas existentes
+            if self.get_recipe(clean) is not None:
+                continue
+
+            # Deducción gastronómica inteligente de insumo común y precio en $ CLP
+            suggested_ing = "Insumo Perecible Principal"
+            default_price = float(DEFAULT_INGREDIENT_PRICES_CLP.get("default", 6500.0))
+            dose_qty = 180.0
+            recipe_unit = "gramos"
+            purchase_unit = "kg"
+            factor = 0.001
+
+            dish_lower = clean.lower()
+            if any(w in dish_lower for w in ["ceviche", "pescado", "reineta"]):
+                suggested_ing = "Pescado Blanco Fresco (Reineta)"
+                default_price = 9500.0
+                dose_qty = 180.0
+            elif any(w in dish_lower for w in ["salmón", "salmon"]):
+                suggested_ing = "Filete de Salmón Fresco"
+                default_price = 14000.0
+                dose_qty = 200.0
+            elif any(w in dish_lower for w in ["atún", "atun"]):
+                suggested_ing = "Atún Fresco"
+                default_price = 15000.0
+                dose_qty = 180.0
+            elif "macha" in dish_lower:
+                suggested_ing = "Lenguas de Machas Frescas"
+                default_price = 11000.0
+                dose_qty = 150.0
+            elif any(w in dish_lower for w in ["lomo", "carne", "vacuno", "bife", "filete"]):
+                suggested_ing = "Lomo Liso Vacuno"
+                default_price = 9800.0
+                dose_qty = 220.0
+            elif "pollo" in dish_lower:
+                suggested_ing = "Pechuga de Pollo"
+                default_price = 4800.0
+                dose_qty = 200.0
+            elif any(w in dish_lower for w in ["empanada", "pino"]):
+                suggested_ing = "Carne Picada Vacuno (Posta)"
+                default_price = 7500.0
+                dose_qty = 120.0
+            elif any(w in dish_lower for w in ["pastel", "choclo"]):
+                suggested_ing = "Pasta de Choclo"
+                default_price = 3800.0
+                dose_qty = 250.0
+            elif "cazuela" in dish_lower:
+                suggested_ing = "Corte de Vacuno (Osobuco/Tapa Pecho)"
+                default_price = 6800.0
+                dose_qty = 250.0
+
+            new_rec = Recipe(
+                dish_name=clean,
+                categoria="Carta General",
+                ingredients=[
+                    IngredientRequirement(
+                        ingredient_name=suggested_ing,
+                        quantity_per_dish=dose_qty,
+                        recipe_unit=recipe_unit,
+                        purchase_unit=purchase_unit,
+                        conversion_factor=factor,
+                        cost_per_unit=default_price
+                    )
+                ]
+            )
+            self.recipes[clean] = new_rec
+            changes = True
 
         if changes:
             self.save_to_disk()
 
+    def ensure_dishes_exist(self, detected_dishes: List[str]):
+        """Alias para mantener compatibilidad hacia atrás."""
+        self.sync_with_detected_dishes(detected_dishes)
+
     def to_dataframe(self) -> pd.DataFrame:
-        """Convierte los escandallos a un DataFrame tabular plano para edición interactiva en Streamlit."""
+        """
+        Convierte los escandallos a un DataFrame tabular plano para edición interactiva
+        en el editor de Streamlit (Pestaña 2).
+        """
         rows = []
         for recipe in self.get_all_recipes():
             if not recipe.ingredients:
                 rows.append({
                     "Plato": recipe.dish_name,
                     "Insumo Perecible": "Sin insumo asignado",
-                    "Dosis por Plato": 0.0,
-                    "Unidad Receta": "g",
+                    "Cantidad": 0.0,
+                    "Unidad": "gramos",
                     "Precio Compra ($ CLP)": 0.0,
+                    "Dosis por Plato": 0.0,
+                    "Unidad Receta": "gramos",
                     "Unidad Compra": "kg"
                 })
             else:
                 for ing in recipe.ingredients:
+                    # Normalizar unidad para visualización amigable
+                    u_display = ing.recipe_unit
+                    if u_display in ["g", "gr"]:
+                        u_display = "gramos"
+                    elif u_display in ["un"]:
+                        u_display = "unidades"
+                    elif u_display in ["l"]:
+                        u_display = "litros"
+
                     rows.append({
                         "Plato": recipe.dish_name,
                         "Insumo Perecible": ing.ingredient_name,
+                        "Cantidad": float(ing.quantity_per_dish),
+                        "Unidad": u_display,
+                        "Precio Compra ($ CLP)": float(ing.cost_per_unit),
                         "Dosis por Plato": float(ing.quantity_per_dish),
                         "Unidad Receta": ing.recipe_unit,
-                        "Precio Compra ($ CLP)": float(ing.cost_per_unit),
                         "Unidad Compra": ing.purchase_unit
                     })
 
@@ -184,26 +247,51 @@ class RecipeService:
         new_recipes: Dict[str, Recipe] = {}
 
         for _, row in df.iterrows():
-            plato = str(row["Plato"]).strip().title()
-            insumo = str(row["Insumo Perecible"]).strip()
-            
+            plato = str(row.get("Plato", "")).strip().title()
+            insumo = str(row.get("Insumo Perecible", "")).strip()
+
             if not plato or not insumo or insumo == "Sin insumo asignado":
                 continue
 
+            dosis_val = row.get("Cantidad", row.get("Dosis por Plato", 100.0))
             try:
-                dosis = float(row["Dosis por Plato"])
+                dosis = float(dosis_val)
             except (ValueError, TypeError):
                 dosis = 100.0
 
+            precio_val = row.get("Precio Compra ($ CLP)", 5000.0)
             try:
-                precio_clp = float(row["Precio Compra ($ CLP)"])
+                precio_clp = float(precio_val)
             except (ValueError, TypeError):
                 precio_clp = 5000.0
 
-            runit = str(row.get("Unidad Receta", "g")).strip().lower()
-            punit = str(row.get("Unidad Compra", "kg")).strip().lower()
+            unit_raw = str(row.get("Unidad", row.get("Unidad Receta", "gramos"))).strip().lower()
 
-            factor = 0.001 if (runit == "g" and punit == "kg") or (runit == "ml" and punit == "l") else 1.0
+            # Normalización y factor de conversión culinario a unidad de compra
+            if unit_raw in ["gramos", "g", "gr"]:
+                runit = "gramos"
+                punit = "kg"
+                factor = 0.001
+            elif unit_raw in ["kg", "kilos", "kilo"]:
+                runit = "kg"
+                punit = "kg"
+                factor = 1.0
+            elif unit_raw in ["ml", "mililitros"]:
+                runit = "ml"
+                punit = "litro"
+                factor = 0.001
+            elif unit_raw in ["litros", "litro", "l"]:
+                runit = "litros"
+                punit = "litro"
+                factor = 1.0
+            elif unit_raw in ["unidades", "unidad", "un"]:
+                runit = "unidades"
+                punit = "un"
+                factor = 1.0
+            else:
+                runit = unit_raw
+                punit = "kg"
+                factor = 0.001
 
             req = IngredientRequirement(
                 ingredient_name=insumo,
@@ -216,7 +304,7 @@ class RecipeService:
 
             if plato not in new_recipes:
                 existing = self.get_recipe(plato)
-                cat = existing.categoria if existing else "General"
+                cat = existing.categoria if existing else "Carta General"
                 new_recipes[plato] = Recipe(dish_name=plato, categoria=cat, ingredients=[])
 
             new_recipes[plato].ingredients.append(req)
