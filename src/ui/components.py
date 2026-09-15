@@ -258,6 +258,30 @@ def inject_custom_styles():
             color: #FFFFFF !important;
             border-color: #3B82F6 !important;
         }
+
+        /* =====================================================================
+           UTILITARIO SCROLL-TO-TOP SIN ESPACIO VISUAL
+           ===================================================================== */
+        iframe[height="0"],
+        iframe[width="0"],
+        div[data-testid="stCustomComponentV1"]:has(iframe[height="0"]),
+        div[data-testid="stElementContainer"]:has(iframe[height="0"]),
+        div[data-testid="element-container"]:has(iframe[height="0"]) {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            max-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            overflow: hidden !important;
+            z-index: -9999 !important;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -330,4 +354,59 @@ def render_info_banner(title: str, message: str):
         </div>
     """).strip()
     st.markdown(html_banner, unsafe_allow_html=True)
+
+
+def scroll_to_top():
+    """
+    Ejecuta un Scroll to Top automático e instantáneo al cambiar de pestaña en Streamlit.
+    Utiliza st.components.v1.html con contenedor de cero dimensiones para no generar espacios en blanco.
+    """
+    import streamlit.components.v1 as components
+
+    js_code = """
+    <style>
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
+        }
+    </style>
+    <script>
+        (function() {
+            function performScroll() {
+                try {
+                    if (window.parent && window.parent.document) {
+                        const mainSection = window.parent.document.querySelector('section.main');
+                        if (mainSection) {
+                            mainSection.scrollTo({top: 0, behavior: 'instant'});
+                        }
+                        const stMain = window.parent.document.querySelector('[data-testid="stMain"]');
+                        if (stMain && stMain !== mainSection) {
+                            stMain.scrollTo({top: 0, behavior: 'instant'});
+                        }
+                        if (window.parent.document.documentElement) {
+                            window.parent.document.documentElement.scrollTop = 0;
+                        }
+                        if (window.parent.document.body) {
+                            window.parent.document.body.scrollTop = 0;
+                        }
+                    }
+                    if (window.parent) {
+                        window.parent.scrollTo({top: 0, behavior: 'instant'});
+                    }
+                } catch (err) {
+                    console.warn("EZtock Scroll-to-Top:", err);
+                }
+            }
+            performScroll();
+            requestAnimationFrame(performScroll);
+            setTimeout(performScroll, 50);
+            setTimeout(performScroll, 150);
+        })();
+    </script>
+    """
+    components.html(js_code, height=0, width=0)
+
 

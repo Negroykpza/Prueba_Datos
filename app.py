@@ -13,7 +13,7 @@ from src.services.pos_parser import POSParser
 from src.services.recipe_service import RecipeService
 from src.services.forecasting import ForecastingEngine
 from src.services.procurement import ProcurementService
-from src.ui.components import inject_custom_styles
+from src.ui.components import inject_custom_styles, scroll_to_top
 from src.ui.views_pos import render_pos_view
 from src.ui.views_recipes import render_recipes_view
 from src.ui.views_procurement import render_financial_dashboard_view
@@ -132,6 +132,13 @@ def main():
 
     # Renderizado condicional según la pestaña activa
     active_tab = selected_tab
+
+    # Scroll to Top automático e imperceptible al cambiar de sección o presionar botones de avance
+    last_rendered_tab = st.session_state.get("_last_rendered_tab")
+    must_scroll = st.session_state.pop("trigger_scroll_top", False)
+    if must_scroll or last_rendered_tab != active_tab:
+        scroll_to_top()
+        st.session_state["_last_rendered_tab"] = active_tab
 
     if active_tab == TAB_OPTIONS[0]:
         render_pos_view(pos_parser, recipe_service)

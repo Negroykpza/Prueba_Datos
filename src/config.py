@@ -124,4 +124,6 @@ def set_active_tab(tab_name: str):
     import streamlit as st
     st.session_state["active_tab"] = tab_name
     st.session_state["selected_tab_name"] = tab_name
+    st.session_state["trigger_scroll_top"] = True
+
 
