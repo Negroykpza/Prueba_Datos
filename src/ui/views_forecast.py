@@ -26,12 +26,14 @@ def render_forecast_view(forecasting_engine: ForecastingEngine):
     col_par1, col_par2 = st.columns([1, 1])
 
     with col_par1:
+        if "safety_margin_forecast" not in st.session_state:
+            st.session_state["safety_margin_forecast"] = 15
         margen_pct = st.slider(
             "🛡️ Margen de Seguridad Operativo (%):",
             min_value=0,
             max_value=30,
-            value=15,
             step=1,
+            key="safety_margin_forecast",
             help="Colchón extra para evitar quiebres de stock ante peaks inesperados. La industria gastronómica recomienda 15%."
         )
 

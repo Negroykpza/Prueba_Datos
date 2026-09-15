@@ -44,6 +44,8 @@ def init_app_state():
         st.session_state["restaurant_name"] = "Restaurante & Bar Central"
     if "periodo_label" not in st.session_state:
         st.session_state["periodo_label"] = "Fin de Semana (Viernes a Domingo)"
+    if "safety_margin" not in st.session_state:
+        st.session_state["safety_margin"] = 15
     if "margen_pct" not in st.session_state:
         st.session_state["margen_pct"] = 15
     if "solo_fin_semana" not in st.session_state:

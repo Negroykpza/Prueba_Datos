@@ -43,12 +43,15 @@ def render_financial_dashboard_view(
         st.session_state["solo_fin_semana"] = solo_fin_semana
 
     with col_c2:
+        if "safety_margin" not in st.session_state:
+            st.session_state["safety_margin"] = 15
+
         margen_pct = st.slider(
             "🛡️ Margen de Seguridad (%):",
             min_value=5,
             max_value=25,
-            value=st.session_state.get("margen_pct", 15),
             step=1,
+            key="safety_margin",
             help="Colchón operativo para evitar quiebres de stock. Rango estándar recomendado: 10% a 15%."
         )
         st.session_state["margen_pct"] = margen_pct
