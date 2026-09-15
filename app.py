@@ -2,13 +2,13 @@
 
 Gestión inteligente de stock, compras y costos gastronómicos en Chile:
 - Pestaña 1: Carga y normalización de ventas POS (con detección automática de platos).
-- Pestaña 2: Editor interactivo de escandallos e insumos con costeo en pesos chilenos ($ CLP).
+- Pestaña 2: Recetas e insumos por plato (ingredientes y costo de compra en $ CLP).
 - Pestaña 3: Dashboard Financiero Primario: Ahorro en $ CLP, Puntos de Fuga y Food Cost Proyectado.
 - Pestaña 4: Mis Proveedores: Lista de compras clasificada con botón de WhatsApp independiente y reportes.
 """
 
 import streamlit as st
-from src.config import APP_NAME, APP_TAGLINE, APP_VERSION
+from src.config import APP_NAME, APP_TAGLINE, APP_VERSION, TAB_OPTIONS, set_active_tab
 from src.services.pos_parser import POSParser
 from src.services.recipe_service import RecipeService
 from src.services.forecasting import ForecastingEngine
@@ -19,17 +19,14 @@ from src.ui.views_recipes import render_recipes_view
 from src.ui.views_procurement import render_financial_dashboard_view
 from src.ui.views_suppliers import render_suppliers_view
 
-TAB_OPTIONS = [
-    "📂 1. Carga de Ventas POS",
-    "🥗 2. Editor de Escandallos ($ CLP)",
-    "💰 3. Dashboard Financiero & Fugas",
-    "🚚 4. Mis Proveedores (Compras & WhatsApp)"
-]
-
 
 def init_app_state():
     """Inicializa variables en el estado de sesión si no existen."""
-    if "active_tab" not in st.session_state:
+    # Soporte para navegación pendiente vía next_tab antes del ciclo de renderizado
+    if "next_tab" in st.session_state and st.session_state["next_tab"]:
+        st.session_state["active_tab"] = st.session_state.pop("next_tab")
+
+    if "active_tab" not in st.session_state or st.session_state["active_tab"] not in TAB_OPTIONS:
         st.session_state["active_tab"] = TAB_OPTIONS[0]
     if "selected_tab_name" not in st.session_state:
         st.session_state["selected_tab_name"] = TAB_OPTIONS[0]
@@ -88,7 +85,7 @@ def main():
         st.markdown(f"• **Ventas POS:** {'🟢 Activas' if has_sales else '⚪ Pendiente de carga'}")
         if detected_count > 0:
             st.markdown(f"• **Platos Detectados:** 🟢 {detected_count} en carta")
-        st.markdown(f"• **Escandallos:** 🟢 {recipes_count} platos costeados")
+        st.markdown(f"• **Recetas:** 🟢 {recipes_count} platos costeados")
         st.markdown(f"• **Motor de Proyección:** {'🟢 Calibrado (+15%)' if has_forecast else '⚪ Listo'}")
 
         st.markdown("---")
@@ -113,6 +110,10 @@ def main():
             f"</div>",
             unsafe_allow_html=True
         )
+
+    # Procesar salto de pestaña pendiente si existe
+    if "next_tab" in st.session_state and st.session_state["next_tab"]:
+        st.session_state["active_tab"] = st.session_state.pop("next_tab")
 
     # Navegación Interactiva por Pestañas (sincronización directa mediante key='active_tab')
     if "active_tab" not in st.session_state or st.session_state["active_tab"] not in TAB_OPTIONS:

@@ -110,3 +110,18 @@ SUPPLIER_KEYWORDS = {
 }
 DEFAULT_SUPPLIER = "🏪 Distribuidora General"
 
+# Opciones de navegación principal en EZtock
+TAB_OPTIONS = [
+    "📂 1. Carga de Ventas POS",
+    "📋 2. Recetas e Insumos",
+    "💰 3. Dashboard Financiero & Fugas",
+    "🚚 4. Mis Proveedores (Compras & WhatsApp)"
+]
+
+
+def set_active_tab(tab_name: str):
+    """Callback seguro para on_click que actualiza la pestaña activa antes del ciclo de renderizado."""
+    import streamlit as st
+    st.session_state["active_tab"] = tab_name
+    st.session_state["selected_tab_name"] = tab_name
+

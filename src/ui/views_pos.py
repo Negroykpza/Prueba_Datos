@@ -4,7 +4,7 @@ import time
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from src.config import APP_NAME, DAYS_OF_WEEK_ES
+from src.config import APP_NAME, DAYS_OF_WEEK_ES, TAB_OPTIONS, set_active_tab
 from src.services.pos_parser import POSParser
 from src.services.recipe_service import RecipeService
 from src.ui.components import render_info_banner, render_metric_card
@@ -283,10 +283,13 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
         st.markdown('<div class="cta-container">', unsafe_allow_html=True)
         col_spacer, col_cta = st.columns([1.5, 1])
         with col_cta:
-            if st.button("Continuar al Editor de Escandallos ($ CLP) ➡️", type="primary", use_container_width=True):
-                st.session_state["active_tab"] = "🥗 2. Editor de Escandallos ($ CLP)"
-                st.session_state["selected_tab_name"] = "🥗 2. Editor de Escandallos ($ CLP)"
-                st.rerun()
+            st.button(
+                "Continuar a Recetas e Insumos ($ CLP) ➡️",
+                type="primary",
+                use_container_width=True,
+                on_click=set_active_tab,
+                args=(TAB_OPTIONS[1],)
+            )
         st.markdown('</div>', unsafe_allow_html=True)
 
     else:

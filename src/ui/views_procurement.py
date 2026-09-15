@@ -7,7 +7,7 @@ import streamlit as st
 import pandas as pd
 from src.services.forecasting import ForecastingEngine
 from src.services.procurement import ProcurementService
-from src.config import APP_NAME
+from src.config import APP_NAME, TAB_OPTIONS, set_active_tab
 from src.ui.components import render_financial_hero_card
 
 
@@ -78,7 +78,7 @@ def render_financial_dashboard_view(
     st.session_state["shopping_df"] = shopping_df
 
     if shopping_df.empty:
-        st.error("No se pudieron generar compras. Asegúrate de tener escandallos e insumos guardados en la Pestaña 2.")
+        st.error("No se pudieron generar compras. Asegúrate de tener recetas e insumos guardados en la Pestaña 2.")
         return
 
     # 3. Métricas Financieras Primarias
@@ -223,10 +223,13 @@ def render_financial_dashboard_view(
     st.markdown('<div class="cta-container">', unsafe_allow_html=True)
     col_spacer, col_cta = st.columns([1.4, 1.1])
     with col_cta:
-        if st.button("Generar Órdenes por Proveedor y Enviar WhatsApp ➡️", type="primary", use_container_width=True):
-            st.session_state["active_tab"] = "🚚 4. Mis Proveedores (Compras & WhatsApp)"
-            st.session_state["selected_tab_name"] = "🚚 4. Mis Proveedores (Compras & WhatsApp)"
-            st.rerun()
+        st.button(
+            "Generar Órdenes por Proveedor y Enviar WhatsApp ➡️",
+            type="primary",
+            use_container_width=True,
+            on_click=set_active_tab,
+            args=(TAB_OPTIONS[3],)
+        )
     st.markdown('</div>', unsafe_allow_html=True)
 
 

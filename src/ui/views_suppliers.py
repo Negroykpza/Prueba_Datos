@@ -46,7 +46,7 @@ def render_suppliers_view(
         st.session_state["shopping_df"] = shopping_df
 
     if shopping_df is None or shopping_df.empty:
-        st.error("No se encontraron insumos para abastecer. Configura los escandallos en la Pestaña 2.")
+        st.error("No se encontraron insumos para abastecer. Configura las recetas e ingredientes en la Pestaña 2.")
         return
 
     # Resumen superior de proveedores con componentes nativos

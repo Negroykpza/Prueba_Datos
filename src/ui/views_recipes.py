@@ -1,22 +1,22 @@
-"""Vista 2: Editor Dinámico e Interactivo de Escandallos e Insumos ($ CLP) para EZtock."""
+"""Vista 2: Editor Dinámico e Interactivo de Recetas e Insumos por Plato ($ CLP) para EZtock."""
 
 import streamlit as st
 import pandas as pd
 from src.services.recipe_service import RecipeService
-from src.config import APP_NAME, DEFAULT_INGREDIENT_PRICES_CLP
+from src.config import APP_NAME, TAB_OPTIONS, set_active_tab
 from src.ui.components import render_info_banner, render_metric_card
 
 
 def render_recipes_view(recipe_service: RecipeService):
-    st.markdown(f'<div class="main-header">🥗 Editor de Escandallos & Fichas Técnicas | {APP_NAME}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-header">🥗 Recetas e Insumos por Plato | {APP_NAME}</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="sub-header">Gestiona el consumo de materias primas perecibles por plato y sus precios de compra en pesos chilenos ($ CLP).</div>',
+        '<div class="sub-header">Gestiona los ingredientes por plato y el costo de compra en pesos chilenos ($ CLP).</div>',
         unsafe_allow_html=True
     )
 
     render_info_banner(
-        "⚡ Editor Directo y Flexible tipo Planilla",
-        "Edita las celdas directamente en la tabla: modifica gramos por plato, agrega nuevos insumos o actualiza los precios en pesos chilenos (<code>$ CLP</code>). Al terminar, presiona <strong>💾 Guardar Cambios</strong>."
+        "⚡ Editor Directo y Flexible de Ingredientes",
+        "Edita las celdas directamente en la tabla: modifica gramos o porciones por plato, agrega nuevos insumos o actualiza los precios en pesos chilenos (<code>$ CLP</code>). Al terminar, presiona <strong>💾 Guardar Cambios</strong>."
     )
 
     # Si hay platos detectados dinámicamente en el POS, sincronizarlos
@@ -24,7 +24,7 @@ def render_recipes_view(recipe_service: RecipeService):
     if detected_dishes:
         recipe_service.sync_with_detected_dishes(detected_dishes)
 
-    # Cargar datos actuales de escandallos
+    # Cargar datos actuales de recetas
     recipes_df = recipe_service.to_dataframe()
 
     # Métricas enriquecidas de la carta en Dark Mode
@@ -36,7 +36,7 @@ def render_recipes_view(recipe_service: RecipeService):
     c1, c2, c3 = st.columns(3)
     with c1:
         render_metric_card(
-            title="Platos en Escandallo",
+            title="Platos con Receta",
             value=str(platos_count),
             delta="100% Mapeados",
             delta_type="positive",
@@ -60,8 +60,8 @@ def render_recipes_view(recipe_service: RecipeService):
         )
 
     st.markdown("---")
-    st.subheader("📋 Tabla Interactiva de Escandallos y Costos")
-    st.markdown("<span style='font-size: 0.88rem; color: #94A3B8;'>Modifica los valores directamente o presiona '+' abajo para agregar nuevos insumos a cualquier plato:</span>", unsafe_allow_html=True)
+    st.subheader("📋 Tabla Interactiva de Ingredientes y Costos por Plato")
+    st.markdown("<span style='font-size: 0.88rem; color: #94A3B8;'>Modifica los valores directamente o presiona '+' abajo para agregar nuevos ingredientes a cualquier plato:</span>", unsafe_allow_html=True)
 
     # Configuración de columnas para st.data_editor
     column_config = {
@@ -89,7 +89,7 @@ def render_recipes_view(recipe_service: RecipeService):
         ),
         "Unidad": st.column_config.SelectboxColumn(
             "Unidad",
-            help="Unidad de medida de la porción en el escandallo.",
+            help="Unidad de medida de la porción en la receta.",
             options=["gramos", "kg", "unidades", "ml", "litros"],
             required=True,
             width="small"
@@ -120,10 +120,10 @@ def render_recipes_view(recipe_service: RecipeService):
     col_btn_save, col_btn_reset, _ = st.columns([1.2, 1.2, 2.5])
 
     with col_btn_save:
-        if st.button("💾 Guardar Cambios en Escandallos", type="primary", use_container_width=True):
+        if st.button("💾 Guardar Cambios en Recetas", type="primary", use_container_width=True):
             recipe_service.update_from_dataframe(edited_df)
-            st.success("✅ ¡Fichas técnicas y precios en $ CLP guardados exitosamente!")
-            st.toast("✅ Escandallos actualizados para el cálculo de compras.")
+            st.success("✅ ¡Recetas y precios en $ CLP guardados exitosamente!")
+            st.toast("✅ Recetas e ingredientes actualizados para el cálculo de compras.")
 
     with col_btn_reset:
         if st.button("🔄 Restaurar Valores por Defecto", use_container_width=True):
@@ -139,12 +139,15 @@ def render_recipes_view(recipe_service: RecipeService):
         </div>
     """, unsafe_allow_html=True)
 
-    # Botón CTA hacia la Pestaña 3
+    # Botón CTA hacia la Pestaña 3 con callback seguro on_click
     st.markdown('<div class="cta-container">', unsafe_allow_html=True)
     col_spacer, col_cta = st.columns([1.5, 1])
     with col_cta:
-        if st.button("Continuar a Dashboard Financiero & Fugas ($ CLP) ➡️", type="primary", use_container_width=True):
-            st.session_state["active_tab"] = "💰 3. Dashboard Financiero & Fugas"
-            st.session_state["selected_tab_name"] = "💰 3. Dashboard Financiero & Fugas"
-            st.rerun()
+        st.button(
+            "Continuar a Dashboard Financiero & Fugas ($ CLP) ➡️",
+            type="primary",
+            use_container_width=True,
+            on_click=set_active_tab,
+            args=(TAB_OPTIONS[2],)
+        )
     st.markdown('</div>', unsafe_allow_html=True)
