@@ -147,7 +147,7 @@ def main():
     elif active_tab == TAB_OPTIONS[1]:
         render_recipes_view(recipe_service)
     elif active_tab == TAB_OPTIONS[2]:
-        render_financial_dashboard_view(forecasting_engine, procurement_service)
+        render_financial_dashboard_view(forecasting_engine, procurement_service, recipe_service)
     elif active_tab == TAB_OPTIONS[3]:
         render_suppliers_view(forecasting_engine, procurement_service)
 

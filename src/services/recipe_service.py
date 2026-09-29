@@ -4,7 +4,12 @@ import json
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 import pandas as pd
-from src.config import DEFAULT_RECIPES_PATH, ACTIVE_RECIPES_PATH, DEFAULT_INGREDIENT_PRICES_CLP
+from src.config import (
+    DEFAULT_RECIPES_PATH,
+    ACTIVE_RECIPES_PATH,
+    DEFAULT_INGREDIENT_PRICES_CLP,
+    DEFAULT_DISH_SALE_PRICES_CLP
+)
 from src.models.schema import Recipe, IngredientRequirement
 
 
@@ -59,14 +64,208 @@ class RecipeService:
         return sorted(list(self.recipes.values()), key=lambda r: r.dish_name)
 
     def get_recipe(self, dish_name: str) -> Optional[Recipe]:
-        """Busca un escandallo por nombre de plato (búsqueda insensible a mayúsculas/minúsculas)."""
+        """Busca un escandallo por nombre de plato (insensible a mayúsculas, espacios y tildes)."""
         if not dish_name:
             return None
-        clean_name = dish_name.strip().lower()
+        clean_name = str(dish_name).strip().lower()
         for name, recipe in self.recipes.items():
             if name.strip().lower() == clean_name:
                 return recipe
+
+        # Fallback normalizado sin tildes/diacríticos
+        import unicodedata
+        def _strip(s: str) -> str:
+            return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
+
+        target_norm = _strip(clean_name)
+        for name, recipe in self.recipes.items():
+            if _strip(name.strip().lower()) == target_norm:
+                return recipe
+
         return None
+
+    def get_recipe_cost(self, dish_name: str) -> float:
+        """
+        Calcula el costo total de insumos de una receta en $ CLP.
+        Suma (ing.quantity_per_dish * ing.conversion_factor * ing.cost_per_unit) de cada ingrediente del plato.
+        Retorna 0.0 si el plato no existe o no tiene ingredientes.
+        """
+        if not dish_name or not str(dish_name).strip():
+            return 0.0
+
+        recipe = self.get_recipe(dish_name)
+        if not recipe or not recipe.ingredients:
+            return 0.0
+
+        total_cost = 0.0
+        for ing in recipe.ingredients:
+            qty = getattr(ing, "quantity_per_dish", 0.0) or 0.0
+            factor = getattr(ing, "conversion_factor", 0.001) or 0.001
+            cost_unit = getattr(ing, "cost_per_unit", 0.0) or 0.0
+            total_cost += float(qty) * float(factor) * float(cost_unit)
+
+        return float(round(total_cost, 2))
+
+    def get_menu_engineering_df(self, sales_df: Optional[pd.DataFrame]) -> pd.DataFrame:
+        """
+        Genera el DataFrame de Ingeniería de Menú y Análisis de Rentabilidad (Matriz BCG).
+        Calcula por cada plato:
+        - Unidades Vendidas
+        - Precio de Venta Promedio ($ CLP)
+        - Costo de Receta ($ CLP)
+        - Margen de Contribución Unitario ($ CLP)
+        - Margen de Contribución (%)
+        - Margen Total Acumulado ($ CLP)
+        - Clasificación en Cuadrante (🌟 Estrella, 🐎 Caballo de Batalla, 🧩 Puzzle, 🐕 Perro)
+        """
+        columns = [
+            "Plato",
+            "Categoria_Cuadrante",
+            "Precio_Venta",
+            "Costo_Receta",
+            "Margen_Unitario",
+            "Margen_Pct",
+            "Unidades_Vendidas",
+            "Margen_Total"
+        ]
+
+        if sales_df is None or not isinstance(sales_df, pd.DataFrame) or sales_df.empty:
+            return pd.DataFrame(columns=columns)
+
+        # 1. Identificar columna de plato
+        dish_col = None
+        for col in sales_df.columns:
+            clean_col = str(col).strip().lower()
+            if clean_col in ["plato", "dish", "item", "producto", "articulo", "item_name", "nombre_producto", "descripcion"]:
+                dish_col = col
+                break
+        if not dish_col:
+            str_cols = sales_df.select_dtypes(include=["object", "string"]).columns
+            dish_col = str_cols[0] if len(str_cols) > 0 else sales_df.columns[0]
+
+        # 2. Identificar columna de cantidad vendida
+        qty_col = None
+        for col in sales_df.columns:
+            clean_col = str(col).strip().lower()
+            if clean_col in ["cantidad", "cant", "cantidad_vendida", "unidades", "qty", "quantity", "cant_vendida", "total_unidades"]:
+                qty_col = col
+                break
+
+        # 3. Identificar columna de precio o ingreso
+        price_col = None
+        rev_col = None
+        for col in sales_df.columns:
+            clean_col = str(col).strip().lower()
+            if clean_col in ["precio", "precio_venta", "precio_unitario", "unit_price", "price", "valor_unitario"]:
+                price_col = col
+                break
+            elif clean_col in ["total", "total_venta", "ingreso", "ingreso_total", "monto", "revenue", "sales"]:
+                rev_col = col
+                break
+
+        # Helper para resolver precio de venta por plato
+        def _resolve_price(d_name: str, calculated_p: float, c_receta: float) -> float:
+            if calculated_p > 0:
+                return float(round(calculated_p, 0))
+
+            lower_d = d_name.lower()
+            if lower_d in DEFAULT_DISH_SALE_PRICES_CLP:
+                return float(DEFAULT_DISH_SALE_PRICES_CLP[lower_d])
+
+            for k, p in DEFAULT_DISH_SALE_PRICES_CLP.items():
+                if k in lower_d or lower_d in k:
+                    return float(p)
+
+            # Fallback estimado con food cost target 30%
+            if c_receta > 0:
+                return float(max(round(c_receta / 0.30, -2), 3500.0))
+
+            return float(DEFAULT_DISH_SALE_PRICES_CLP.get("default", 10500))
+
+        # 4. Agrupar por plato y calcular métricas
+        records = []
+        for dish_val, group in sales_df.groupby(dish_col):
+            d_name = str(dish_val).strip().title()
+            if not d_name or d_name.lower() in ["nan", "none", "", "null"]:
+                continue
+
+            # Unidades vendidas
+            if qty_col and qty_col in group.columns:
+                u_series = pd.to_numeric(group[qty_col], errors="coerce").fillna(0)
+                unidades = float(u_series.sum())
+            else:
+                unidades = float(len(group))
+
+            if unidades <= 0:
+                unidades = 1.0
+
+            # Costo de receta
+            costo_receta = self.get_recipe_cost(d_name)
+
+            # Precio de venta
+            calc_price = 0.0
+            if price_col and price_col in group.columns:
+                p_series = pd.to_numeric(group[price_col], errors="coerce").dropna()
+                if not p_series.empty and p_series.mean() > 0:
+                    calc_price = float(p_series.mean())
+            elif rev_col and rev_col in group.columns:
+                r_series = pd.to_numeric(group[rev_col], errors="coerce").fillna(0)
+                tot_rev = float(r_series.sum())
+                if tot_rev > 0 and unidades > 0:
+                    calc_price = float(tot_rev / unidades)
+
+            precio_venta = _resolve_price(d_name, calc_price, costo_receta)
+
+            # Si el precio es menor o igual al costo de receta, calibrar con food cost target
+            if costo_receta > 0 and precio_venta <= costo_receta:
+                precio_venta = float(round(costo_receta / 0.30, -2))
+
+            margen_unitario = precio_venta - costo_receta
+            margen_pct = (margen_unitario / precio_venta * 100.0) if precio_venta > 0 else 0.0
+            margen_total = margen_unitario * unidades
+
+            records.append({
+                "Plato": d_name,
+                "Precio_Venta": float(round(precio_venta, 2)),
+                "Costo_Receta": float(round(costo_receta, 2)),
+                "Margen_Unitario": float(round(margen_unitario, 2)),
+                "Margen_Pct": float(round(margen_pct, 2)),
+                "Unidades_Vendidas": float(round(unidades, 1)),
+                "Margen_Total": float(round(margen_total, 2))
+            })
+
+        if not records:
+            return pd.DataFrame(columns=columns)
+
+        result_df = pd.DataFrame(records)
+
+        # 5. Clasificación en Cuadrantes (Matriz BCG / Menú Engineering)
+        mean_units = float(result_df["Unidades_Vendidas"].mean())
+        mean_margin = float(result_df["Margen_Unitario"].mean())
+
+        def _classify(row):
+            high_rot = row["Unidades_Vendidas"] >= mean_units
+            high_mar = row["Margen_Unitario"] >= mean_margin
+            if high_rot and high_mar:
+                return "🌟 Estrella"
+            elif high_rot and not high_mar:
+                return "🐎 Caballo de Batalla"
+            elif not high_rot and high_mar:
+                return "🧩 Puzzle (Rompecabezas)"
+            else:
+                return "🐕 Perro (Baja Rentabilidad)"
+
+        result_df["Categoria_Cuadrante"] = result_df.apply(_classify, axis=1)
+
+        # Sanitización de nulos o infinitos
+        result_df = result_df.fillna(0.0)
+        result_df = result_df.replace([float("inf"), float("-inf")], 0.0)
+
+        # Ordenar por Margen Total Acumulado descendente
+        result_df = result_df.sort_values(by="Margen_Total", ascending=False).reset_index(drop=True)
+
+        return result_df
+
 
     def upsert_recipe(self, recipe: Recipe):
         """Crea o actualiza un escandallo y guarda los cambios en disco."""

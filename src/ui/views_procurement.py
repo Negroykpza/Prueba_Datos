@@ -1,5 +1,6 @@
 """Vista 3: Dashboard Financiero EZtock, Métricas Primarias, Alertas Operativas y Análisis de Costos ($ CLP)."""
 
+from typing import Optional, Any
 from datetime import timedelta
 import textwrap
 import plotly.graph_objects as go
@@ -7,13 +8,15 @@ import streamlit as st
 import pandas as pd
 from src.services.forecasting import ForecastingEngine
 from src.services.procurement import ProcurementService
+from src.services.recipe_service import RecipeService
 from src.config import APP_NAME, TAB_OPTIONS, set_active_tab
 from src.ui.components import render_financial_hero_card
 
 
 def render_financial_dashboard_view(
     forecasting_engine: ForecastingEngine,
-    procurement_service: ProcurementService
+    procurement_service: ProcurementService,
+    recipe_service: Optional[RecipeService] = None
 ):
     """Renderiza el Dashboard Financiero Primario (Pestaña 3)."""
     st.markdown(f'<div class="main-header">💰 Dashboard Financiero & Fugas ($ CLP) | {APP_NAME}</div>', unsafe_allow_html=True)
@@ -26,6 +29,13 @@ def render_financial_dashboard_view(
     if sales_df is None or sales_df.empty:
         st.warning("⚠️ Para ver las métricas financieras, primero sube tu archivo CSV o presiona 'Usar Datos Demo de 90 Días' en la Pestaña 1.")
         return
+
+    if recipe_service is None:
+        recipe_service = getattr(procurement_service, "recipe_service", None)
+    if recipe_service is None:
+        recipe_service = RecipeService()
+
+    menu_df = recipe_service.get_menu_engineering_df(sales_df)
 
     # 1. Controles Superiores de Gestión y Simulación
     col_c1, col_c2, col_c3 = st.columns([1.2, 1.2, 1.2])
@@ -158,6 +168,186 @@ def render_financial_dashboard_view(
             xaxis=dict(gridcolor="#334155", tickformat="$,d")
         )
         st.plotly_chart(fig_cost, use_container_width=True)
+
+    st.markdown("---")
+
+    # =========================================================================
+    # 4.1 RENTABILIDAD DE RECETAS E INGENIERÍA DE MENÚ (MATRIZ BCG)
+    # =========================================================================
+    st.subheader("📈 Rentabilidad de Recetas e Ingeniería de Menú")
+    st.markdown(
+        "<span style='font-size: 0.92rem; color: #94A3B8;'>Análisis estratégico de popularidad (rotación) vs. margen de contribución unitario para optimizar la rentabilidad de la carta.</span>",
+        unsafe_allow_html=True
+    )
+
+    if not menu_df.empty:
+        # 1. Tres Métricas Clave en Columnas
+        col_m1, col_m2, col_m3 = st.columns(3)
+
+        avg_margin_pct = float(menu_df["Margen_Pct"].mean())
+        with col_m1:
+            st.metric(
+                "Margen Contribución Promedio",
+                f"{avg_margin_pct:.1f}%",
+                help="Promedio porcentual del margen sobre el precio de venta en todos los platos analizados."
+            )
+
+        # Plato Más Rentable (mayor contribución total en $ CLP)
+        top_profit_idx = menu_df["Margen_Total"].idxmax()
+        top_profit_row = menu_df.loc[top_profit_idx]
+        with col_m2:
+            st.metric(
+                "Plato Más Rentable",
+                top_profit_row["Plato"],
+                delta=f"+${int(top_profit_row['Margen_Total']):,} CLP".replace(",", "."),
+                help="Plato con la mayor ganancia bruta acumulada (Margen Unitario × Unidades Vendidas)."
+            )
+
+        # Plato Estrella (mayor rotación y margen)
+        star_df = menu_df[menu_df["Categoria_Cuadrante"] == "🌟 Estrella"]
+        with col_m3:
+            if not star_df.empty:
+                top_star = star_df.loc[star_df["Margen_Total"].idxmax()]
+                st.metric(
+                    "Plato Estrella",
+                    top_star["Plato"],
+                    delta=f"${int(top_star['Margen_Unitario']):,} CLP / plato".replace(",", "."),
+                    help="Plato líder en el cuadrante de alta rotación y alto margen de contribución."
+                )
+            else:
+                top_overall = menu_df.iloc[0]
+                st.metric(
+                    "Plato Estrella",
+                    top_overall["Plato"],
+                    delta=f"${int(top_overall['Margen_Unitario']):,} CLP".replace(",", "."),
+                    help="Plato con mayor contribución individual."
+                )
+
+        # 2. Gráfico Scatter Plot interactivo con Plotly
+        mean_u = float(menu_df["Unidades_Vendidas"].mean())
+        mean_m = float(menu_df["Margen_Unitario"].mean())
+
+        fig_menu = go.Figure()
+
+        quadrant_configs = [
+            ("🌟 Estrella", "#10B981", "star", 15),
+            ("🐎 Caballo de Batalla", "#38BDF8", "square", 12),
+            ("🧩 Puzzle (Rompecabezas)", "#F59E0B", "diamond", 12),
+            ("🐕 Perro (Baja Rentabilidad)", "#EF4444", "circle", 11)
+        ]
+
+        for cat_name, color, symbol, size in quadrant_configs:
+            sub_df = menu_df[menu_df["Categoria_Cuadrante"] == cat_name]
+            if sub_df.empty:
+                continue
+
+            hover_texts = []
+            for _, r in sub_df.iterrows():
+                p_v = f"${int(r['Precio_Venta']):,} CLP".replace(",", ".")
+                c_r = f"${int(r['Costo_Receta']):,} CLP".replace(",", ".")
+                m_u = f"${int(r['Margen_Unitario']):,} CLP".replace(",", ".")
+                m_p = f"{r['Margen_Pct']:.1f}%"
+                u_v = f"{int(r['Unidades_Vendidas']):,} un".replace(",", ".")
+                m_t = f"${int(r['Margen_Total']):,} CLP".replace(",", ".")
+                hover_texts.append(
+                    f"<b>{r['Plato']}</b><br>"
+                    f"• Categoría: <b>{cat_name}</b><br>"
+                    f"• Precio de Venta: <b>{p_v}</b><br>"
+                    f"• Costo de Insumos: <b>{c_r}</b><br>"
+                    f"• Margen Unitario: <b>{m_u}</b> ({m_p})<br>"
+                    f"• Unidades Vendidas: <b>{u_v}</b><br>"
+                    f"• Margen Total Acumulado: <b>{m_t}</b>"
+                    "<extra></extra>"
+                )
+
+            fig_menu.add_trace(go.Scatter(
+                x=sub_df["Unidades_Vendidas"],
+                y=sub_df["Margen_Unitario"],
+                mode="markers+text",
+                name=cat_name,
+                text=sub_df["Plato"],
+                textposition="top center",
+                textfont=dict(size=10, color="#CBD5E1"),
+                marker=dict(
+                    color=color,
+                    symbol=symbol,
+                    size=size,
+                    line=dict(width=1.5, color="#F8FAFC")
+                ),
+                hovertext=hover_texts,
+                hovertemplate="%{hovertext}"
+            ))
+
+        # Líneas guía de corte en la media de ventas y margen
+        fig_menu.add_vline(
+            x=mean_u,
+            line_dash="dot",
+            line_color="#94A3B8",
+            line_width=1.5,
+            annotation_text=f"Media Ventas ({mean_u:.0f} un)",
+            annotation_position="top right",
+            annotation_font=dict(color="#94A3B8", size=10)
+        )
+        fig_menu.add_hline(
+            y=mean_m,
+            line_dash="dot",
+            line_color="#94A3B8",
+            line_width=1.5,
+            annotation_text=f"Media Margen (${int(mean_m):,} CLP)".replace(",", "."),
+            annotation_position="bottom right",
+            annotation_font=dict(color="#94A3B8", size=10)
+        )
+
+        fig_menu.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#CBD5E1"),
+            margin=dict(l=30, r=30, t=35, b=40),
+            height=460,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="center",
+                x=0.5,
+                bgcolor="rgba(15,23,42,0.75)",
+                bordercolor="#334155",
+                borderwidth=1
+            ),
+            xaxis=dict(
+                title="Unidades Vendidas (Popularidad / Rotación)",
+                gridcolor="#334155",
+                zerolinecolor="#334155"
+            ),
+            yaxis=dict(
+                title="Margen de Contribución Unitario ($ CLP)",
+                gridcolor="#334155",
+                zerolinecolor="#334155",
+                tickformat="$,d"
+            )
+        )
+
+        st.plotly_chart(fig_menu, use_container_width=True)
+
+        # 3. Tabla interactiva formateada con st.dataframe
+        st.markdown("##### 📋 Matriz Detallada de Rentabilidad por Plato")
+        table_df = pd.DataFrame({
+            "Plato": menu_df["Plato"],
+            "Categoría/Cuadrante": menu_df["Categoria_Cuadrante"],
+            "Precio Venta ($)": menu_df["Precio_Venta"].apply(lambda v: f"${int(v):,} CLP".replace(",", ".")),
+            "Costo Receta ($)": menu_df["Costo_Receta"].apply(lambda v: f"${int(v):,} CLP".replace(",", ".")),
+            "Margen ($)": menu_df["Margen_Unitario"].apply(lambda v: f"${int(v):,} CLP".replace(",", ".")),
+            "Margen (%)": menu_df["Margen_Pct"].apply(lambda v: f"{v:.1f}%"),
+            "Unidades Vendidas": menu_df["Unidades_Vendidas"].astype(int)
+        })
+
+        st.dataframe(
+            table_df,
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.info("ℹ️ Sube un archivo de ventas en la Pestaña 1 para generar el análisis de Ingeniería de Menú.")
 
     st.markdown("---")
 

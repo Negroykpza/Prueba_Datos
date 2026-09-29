@@ -90,6 +90,68 @@ class TestRecipeService(unittest.TestCase):
         reloaded = self.service.get_recipe("Ceviche Mixto")
         self.assertEqual(reloaded.ingredients[0].quantity_per_dish, 250.0)
 
+    def test_get_recipe_cost(self):
+        # 180 gramos * 0.001 * 9500 = 1710.0 CLP
+        cost = self.service.get_recipe_cost("Ceviche Mixto")
+        self.assertEqual(cost, 1710.0)
+
+        # Plato inexistente o vacío
+        self.assertEqual(self.service.get_recipe_cost("Plato Fantasma"), 0.0)
+        self.assertEqual(self.service.get_recipe_cost(""), 0.0)
+        self.assertEqual(self.service.get_recipe_cost(None), 0.0)
+
+    def test_get_menu_engineering_df(self):
+        # Caso vacío o None
+        empty_df = self.service.get_menu_engineering_df(None)
+        self.assertTrue(empty_df.empty)
+        self.assertIn("Plato", empty_df.columns)
+        self.assertIn("Categoria_Cuadrante", empty_df.columns)
+
+        # Crear datos de ventas simulados con varios platos
+        self.service.sync_with_detected_dishes(["Lomo Saltado", "Pastel de Choclo", "Empanada de Pino"])
+        sales_data = pd.DataFrame([
+            {"fecha": "2026-06-01", "plato": "Ceviche Mixto", "cantidad": 50},
+            {"fecha": "2026-06-02", "plato": "Ceviche Mixto", "cantidad": 50},
+            {"fecha": "2026-06-01", "plato": "Lomo Saltado", "cantidad": 80},
+            {"fecha": "2026-06-01", "plato": "Pastel de Choclo", "cantidad": 10},
+            {"fecha": "2026-06-01", "plato": "Empanada de Pino", "cantidad": 20},
+        ])
+
+        menu_df = self.service.get_menu_engineering_df(sales_data)
+        self.assertFalse(menu_df.empty)
+        self.assertEqual(len(menu_df), 4)
+
+        # Verificar columnas obligatorias
+        expected_cols = [
+            "Plato", "Categoria_Cuadrante", "Precio_Venta", "Costo_Receta",
+            "Margen_Unitario", "Margen_Pct", "Unidades_Vendidas", "Margen_Total"
+        ]
+        for col in expected_cols:
+            self.assertIn(col, menu_df.columns)
+
+        # Verificar que Lomo Saltado tiene 80 unidades y Ceviche Mixto tiene 100 unidades
+        ceviche_row = menu_df[menu_df["Plato"] == "Ceviche Mixto"].iloc[0]
+        self.assertEqual(ceviche_row["Unidades_Vendidas"], 100.0)
+        self.assertEqual(ceviche_row["Costo_Receta"], 1710.0)
+        self.assertTrue(ceviche_row["Precio_Venta"] > ceviche_row["Costo_Receta"])
+        self.assertTrue(ceviche_row["Margen_Unitario"] > 0)
+        self.assertTrue(ceviche_row["Margen_Total"] > 0)
+
+        # Verificar que todos los platos tienen una categoría cuadrante válida
+        valid_quadrants = {
+            "🌟 Estrella",
+            "🐎 Caballo de Batalla",
+            "🧩 Puzzle (Rompecabezas)",
+            "🐕 Perro (Baja Rentabilidad)"
+        }
+        for cat in menu_df["Categoria_Cuadrante"]:
+            self.assertIn(cat, valid_quadrants)
+
+        # Verificar orden descendente por Margen Total
+        margenes = menu_df["Margen_Total"].tolist()
+        self.assertEqual(margenes, sorted(margenes, reverse=True))
+
 
 if __name__ == "__main__":
     unittest.main()
+

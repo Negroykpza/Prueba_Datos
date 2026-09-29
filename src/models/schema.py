@@ -74,6 +74,17 @@ class Recipe:
             ingredients=ingredients
         )
 
+    def get_cost(self) -> float:
+        """Calcula el costo total de insumos de este escandallo en $ CLP."""
+        total = 0.0
+        for ing in self.ingredients:
+            qty = getattr(ing, "quantity_per_dish", 0.0) or 0.0
+            factor = getattr(ing, "conversion_factor", 0.001) or 0.001
+            cost = getattr(ing, "cost_per_unit", 0.0) or 0.0
+            total += float(qty) * float(factor) * float(cost)
+        return float(round(total, 2))
+
+
 
 @dataclass
 class SaleRecord:
