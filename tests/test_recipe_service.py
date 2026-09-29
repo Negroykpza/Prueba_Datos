@@ -124,7 +124,8 @@ class TestRecipeService(unittest.TestCase):
         # Verificar columnas obligatorias
         expected_cols = [
             "Plato", "Categoria_Cuadrante", "Precio_Venta", "Costo_Receta",
-            "Margen_Unitario", "Margen_Pct", "Unidades_Vendidas", "Margen_Total"
+            "Margen_Unitario", "Margen_Pct", "Unidades_Vendidas", "Margen_Total",
+            "Ventas_Totales", "Costo_Total_Insumos", "Mix_Ventas_Pct"
         ]
         for col in expected_cols:
             self.assertIn(col, menu_df.columns)
@@ -136,13 +137,15 @@ class TestRecipeService(unittest.TestCase):
         self.assertTrue(ceviche_row["Precio_Venta"] > ceviche_row["Costo_Receta"])
         self.assertTrue(ceviche_row["Margen_Unitario"] > 0)
         self.assertTrue(ceviche_row["Margen_Total"] > 0)
+        self.assertEqual(ceviche_row["Ventas_Totales"], ceviche_row["Unidades_Vendidas"] * ceviche_row["Precio_Venta"])
+        self.assertEqual(ceviche_row["Costo_Total_Insumos"], ceviche_row["Unidades_Vendidas"] * ceviche_row["Costo_Receta"])
 
         # Verificar que todos los platos tienen una categoría cuadrante válida
         valid_quadrants = {
             "🌟 Estrella",
             "🐎 Caballo de Batalla",
-            "🧩 Puzzle (Rompecabezas)",
-            "🐕 Perro (Baja Rentabilidad)"
+            "🧩 Puzzle",
+            "🐕 Perro"
         }
         for cat in menu_df["Categoria_Cuadrante"]:
             self.assertIn(cat, valid_quadrants)
@@ -150,6 +153,37 @@ class TestRecipeService(unittest.TestCase):
         # Verificar orden descendente por Margen Total
         margenes = menu_df["Margen_Total"].tolist()
         self.assertEqual(margenes, sorted(margenes, reverse=True))
+
+        # Verificar que la suma de Mix_Ventas_Pct sea cercana a 100%
+        mix_sum = menu_df["Mix_Ventas_Pct"].sum()
+        self.assertAlmostEqual(mix_sum, 100.0, places=0)
+
+    def test_update_from_dataframe_with_filtered_dish(self):
+        # Sincronizar dos platos
+        self.service.sync_with_detected_dishes(["Lomo Saltado", "Pastel de Choclo"])
+        all_dishes_before = set(self.service.recipes.keys())
+        self.assertEqual(len(all_dishes_before), 3)
+        self.assertIsNotNone(self.service.get_recipe("Ceviche Mixto"))
+        self.assertIsNotNone(self.service.get_recipe("Lomo Saltado"))
+        self.assertIsNotNone(self.service.get_recipe("Pastel de Choclo"))
+
+        # Obtener dataframe completo y filtrar solo Ceviche Mixto
+        df_full = self.service.to_dataframe()
+        ceviche_df = df_full[df_full["Plato"] == "Ceviche Mixto"].copy()
+        ceviche_df["Cantidad"] = 350.0
+
+        # Guardar únicamente el plato filtrado
+        self.service.update_from_dataframe(ceviche_df, filtered_dish="Ceviche Mixto")
+
+        # Verificar que Ceviche Mixto fue actualizado
+        ceviche_recipe = self.service.get_recipe("Ceviche Mixto")
+        self.assertEqual(ceviche_recipe.ingredients[0].quantity_per_dish, 350.0)
+
+        # Verificar que los otros platos NO fueron eliminados ni modificados
+        all_dishes_after = set(self.service.recipes.keys())
+        self.assertEqual(all_dishes_before, all_dishes_after)
+        self.assertIsNotNone(self.service.get_recipe("Lomo Saltado"))
+        self.assertIsNotNone(self.service.get_recipe("Pastel de Choclo"))
 
 
 if __name__ == "__main__":

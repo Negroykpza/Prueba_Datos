@@ -220,6 +220,8 @@ class RecipeService:
             if costo_receta > 0 and precio_venta <= costo_receta:
                 precio_venta = float(round(costo_receta / 0.30, -2))
 
+            ventas_totales = unidades * precio_venta
+            costo_total_insumos = unidades * costo_receta
             margen_unitario = precio_venta - costo_receta
             margen_pct = (margen_unitario / precio_venta * 100.0) if precio_venta > 0 else 0.0
             margen_total = margen_unitario * unidades
@@ -231,11 +233,18 @@ class RecipeService:
                 "Margen_Unitario": float(round(margen_unitario, 2)),
                 "Margen_Pct": float(round(margen_pct, 2)),
                 "Unidades_Vendidas": float(round(unidades, 1)),
+                "Ventas_Totales": float(round(ventas_totales, 2)),
+                "Costo_Total_Insumos": float(round(costo_total_insumos, 2)),
                 "Margen_Total": float(round(margen_total, 2))
             })
 
         if not records:
             return pd.DataFrame(columns=columns)
+
+        # Calcular % Mix de Ventas
+        total_ventas_sum = sum(r["Ventas_Totales"] for r in records)
+        for r in records:
+            r["Mix_Ventas_Pct"] = float(round((r["Ventas_Totales"] / total_ventas_sum * 100.0), 2)) if total_ventas_sum > 0 else 0.0
 
         result_df = pd.DataFrame(records)
 
@@ -251,9 +260,9 @@ class RecipeService:
             elif high_rot and not high_mar:
                 return "🐎 Caballo de Batalla"
             elif not high_rot and high_mar:
-                return "🧩 Puzzle (Rompecabezas)"
+                return "🧩 Puzzle"
             else:
-                return "🐕 Perro (Baja Rentabilidad)"
+                return "🐕 Perro"
 
         result_df["Categoria_Cuadrante"] = result_df.apply(_classify, axis=1)
 
@@ -435,15 +444,23 @@ class RecipeService:
 
         return pd.DataFrame(rows)
 
-    def update_from_dataframe(self, df: pd.DataFrame):
+    def update_from_dataframe(self, df: pd.DataFrame, filtered_dish: Optional[str] = None):
         """
         Reconstruye y persiste la lista de escandallos a partir de los datos editados
         en el st.data_editor de Streamlit.
+        Si filtered_dish está especificado y es distinto de 'Todos los platos', actualiza
+        únicamente ese plato y preserva todos los demás escandallos existentes.
         """
-        if df.empty:
+        if df.empty and not filtered_dish:
             return
 
-        new_recipes: Dict[str, Recipe] = {}
+        if filtered_dish and filtered_dish != "Todos los platos":
+            clean_filtered = str(filtered_dish).strip().title()
+            new_recipes: Dict[str, Recipe] = {
+                k: v for k, v in self.recipes.items() if k.strip().title() != clean_filtered
+            }
+        else:
+            new_recipes: Dict[str, Recipe] = {}
 
         for _, row in df.iterrows():
             plato = str(row.get("Plato", "")).strip().title()

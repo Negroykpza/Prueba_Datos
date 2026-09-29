@@ -22,7 +22,20 @@ from src.ui.views_suppliers import render_suppliers_view
 
 def init_app_state():
     """Inicializa variables en el estado de sesión si no existen."""
-    # Soporte para navegación pendiente vía next_tab antes del ciclo de renderizado
+    # Soporte para migración de pestañas previas y navegación pendiente
+    legacy_map = {
+        "📂 1. Carga de Ventas POS": TAB_OPTIONS[0],
+        "📋 2. Recetas e Insumos": TAB_OPTIONS[1],
+        "💰 3. Dashboard Financiero & Fugas": TAB_OPTIONS[2],
+        "🚚 4. Mis Proveedores (Compras & WhatsApp)": TAB_OPTIONS[3]
+    }
+    if st.session_state.get("active_tab") in legacy_map:
+        st.session_state["active_tab"] = legacy_map[st.session_state["active_tab"]]
+    if st.session_state.get("selected_tab_name") in legacy_map:
+        st.session_state["selected_tab_name"] = legacy_map[st.session_state["selected_tab_name"]]
+    if st.session_state.get("next_tab") in legacy_map:
+        st.session_state["next_tab"] = legacy_map[st.session_state["next_tab"]]
+
     if "next_tab" in st.session_state and st.session_state["next_tab"]:
         st.session_state["active_tab"] = st.session_state.pop("next_tab")
 
@@ -113,9 +126,19 @@ def main():
             unsafe_allow_html=True
         )
 
-    # Procesar salto de pestaña pendiente si existe
+    # Procesar salto de pestaña pendiente si existe y migrar nombres anteriores
+    legacy_map = {
+        "📂 1. Carga de Ventas POS": TAB_OPTIONS[0],
+        "📋 2. Recetas e Insumos": TAB_OPTIONS[1],
+        "💰 3. Dashboard Financiero & Fugas": TAB_OPTIONS[2],
+        "🚚 4. Mis Proveedores (Compras & WhatsApp)": TAB_OPTIONS[3]
+    }
+    if st.session_state.get("active_tab") in legacy_map:
+        st.session_state["active_tab"] = legacy_map[st.session_state["active_tab"]]
+
     if "next_tab" in st.session_state and st.session_state["next_tab"]:
-        st.session_state["active_tab"] = st.session_state.pop("next_tab")
+        st.session_state["active_tab"] = legacy_map.get(st.session_state["next_tab"], st.session_state["next_tab"])
+        st.session_state.pop("next_tab")
 
     # Navegación Interactiva por Pestañas (sincronización directa mediante key='active_tab')
     if "active_tab" not in st.session_state or st.session_state["active_tab"] not in TAB_OPTIONS:

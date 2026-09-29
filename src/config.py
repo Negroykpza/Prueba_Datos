@@ -110,20 +110,28 @@ SUPPLIER_KEYWORDS = {
 }
 DEFAULT_SUPPLIER = "🏪 Distribuidora General"
 
-# Opciones de navegación principal en EZtock
+# Opciones de navegación principal en EZtock (Mobile-First optimizado)
 TAB_OPTIONS = [
-    "📂 1. Carga de Ventas POS",
-    "📋 2. Recetas e Insumos",
-    "💰 3. Dashboard Financiero & Fugas",
-    "🚚 4. Mis Proveedores (Compras & WhatsApp)"
+    "📂 1. Ventas",
+    "📋 2. Recetas",
+    "💰 3. Finanzas",
+    "🚚 4. Proveedores"
 ]
 
 
 def set_active_tab(tab_name: str):
     """Callback seguro para on_click que actualiza la pestaña activa antes del ciclo de renderizado."""
     import streamlit as st
-    st.session_state["active_tab"] = tab_name
-    st.session_state["selected_tab_name"] = tab_name
+    legacy_map = {
+        "📂 1. Carga de Ventas POS": TAB_OPTIONS[0],
+        "📋 2. Recetas e Insumos": TAB_OPTIONS[1],
+        "💰 3. Dashboard Financiero & Fugas": TAB_OPTIONS[2],
+        "🚚 4. Mis Proveedores (Compras & WhatsApp)": TAB_OPTIONS[3]
+    }
+    target = legacy_map.get(tab_name, tab_name)
+    st.session_state["active_tab"] = target
+    st.session_state["selected_tab_name"] = target
     st.session_state["trigger_scroll_top"] = True
+
 
 

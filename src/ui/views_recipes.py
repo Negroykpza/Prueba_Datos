@@ -106,14 +106,32 @@ def render_recipes_view(recipe_service: RecipeService):
         )
     }
 
+    # Selector de filtrado y búsqueda de platos
+    available_dishes = sorted(list(set(recipes_df["Plato"].dropna().astype(str).unique())))
+    filter_options = ["Todos los platos"] + available_dishes
+
+    col_filtro, _ = st.columns([1.6, 2.4])
+    with col_filtro:
+        selected_dish = st.selectbox(
+            "🔍 Filtrar y editar por plato:",
+            options=filter_options,
+            key="recipe_dish_filter",
+            help="Selecciona un plato para editar solo sus ingredientes sin tener que desplazarte por toda la carta."
+        )
+
+    if selected_dish != "Todos los platos":
+        df_to_edit = recipes_df[recipes_df["Plato"] == selected_dish].copy()
+    else:
+        df_to_edit = recipes_df.copy()
+
     # Editor interactivo
     edited_df = st.data_editor(
-        recipes_df,
+        df_to_edit,
         column_config=column_config,
         num_rows="dynamic",
         use_container_width=True,
         hide_index=True,
-        key="recipes_data_editor",
+        key=f"recipes_data_editor_{selected_dish}",
         height=380
     )
 
@@ -121,7 +139,7 @@ def render_recipes_view(recipe_service: RecipeService):
 
     with col_btn_save:
         if st.button("💾 Guardar Cambios en Recetas", type="primary", use_container_width=True):
-            recipe_service.update_from_dataframe(edited_df)
+            recipe_service.update_from_dataframe(edited_df, filtered_dish=selected_dish)
             st.success("✅ ¡Recetas y precios en $ CLP guardados exitosamente!")
             st.toast("✅ Recetas e ingredientes actualizados para el cálculo de compras.")
 
