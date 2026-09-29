@@ -35,17 +35,20 @@ def render_financial_dashboard_view(
     if recipe_service is None:
         recipe_service = RecipeService()
 
-    tab_abast, tab_menu = st.tabs(["📦 Abastecimiento y Fugas", "📈 Rentabilidad y Menú Engineering"])
+    tab_abast, tab_menu = st.tabs(["📦 Abastecimiento y Fugas", "📈 Rentabilidad e Ingeniería de Menú"])
 
     with tab_abast:
         # 1. Controles Superiores de Gestión y Simulación
         col_c1, col_c2, col_c3 = st.columns([1.2, 1.2, 1.2])
 
         with col_c1:
+            if "periodo_abastecimiento" not in st.session_state:
+                st.session_state.periodo_abastecimiento = "🎯 Solo Fin de Semana (Vie - Sáb - Dom)"
+
             filtro_horizonte = st.radio(
                 "📅 Período de Abastecimiento:",
                 options=["🎯 Solo Fin de Semana (Vie - Sáb - Dom)", "🗓️ Próximos 7 Días Corridos"],
-                index=0 if st.session_state.get("solo_fin_semana", True) else 1,
+                key="periodo_abastecimiento",
                 help="En Chile, la mayor demanda de perecibles se concentra de viernes a domingo."
             )
             solo_fin_semana = (filtro_horizonte == "🎯 Solo Fin de Semana (Vie - Sáb - Dom)")
@@ -265,26 +268,26 @@ def render_financial_dashboard_view(
             total_margin = float(menu_df["Margen_Total"].sum())
             avg_margin_pct = float(menu_df["Margen_Pct"].mean())
 
-            # Facturación Total Estimada
+            # Facturación Total Estimada ($ CLP)
             with col_m1:
                 st.metric(
-                    "Facturación Total Estimada",
+                    "Facturación Total Estimada ($ CLP)",
                     f"${int(total_billing):,} CLP".replace(",", "."),
                     help="Ingreso total estimado por venta de platos en el histórico analizado."
                 )
 
-            # Margen Total Acumulado
+            # Margen Total Acumulado ($ CLP)
             with col_m2:
                 st.metric(
-                    "Margen Total Acumulado",
+                    "Margen Total Acumulado ($ CLP)",
                     f"${int(total_margin):,} CLP".replace(",", "."),
                     help="Ganancia bruta total generada (Ventas Totales - Costo Total Insumos)."
                 )
 
-            # Margen Contribución Promedio
+            # Margen Contribución Promedio (%)
             with col_m3:
                 st.metric(
-                    "Margen Contribución Promedio",
+                    "Margen Contribución Promedio (%)",
                     f"{avg_margin_pct:.1f}%",
                     help="Promedio porcentual del margen sobre el precio de venta en todos los platos analizados."
                 )
@@ -320,7 +323,7 @@ def render_financial_dashboard_view(
             quadrant_configs = [
                 ("🌟 Estrella", "#10B981", "star", 15),
                 ("🐎 Caballo de Batalla", "#38BDF8", "square", 12),
-                ("🧩 Puzzle", "#F59E0B", "diamond", 12),
+                ("🧩 Rompecabezas", "#F59E0B", "diamond", 12),
                 ("🐕 Perro", "#EF4444", "circle", 11)
             ]
 

@@ -144,7 +144,7 @@ class TestRecipeService(unittest.TestCase):
         valid_quadrants = {
             "🌟 Estrella",
             "🐎 Caballo de Batalla",
-            "🧩 Puzzle",
+            "🧩 Rompecabezas",
             "🐕 Perro"
         }
         for cat in menu_df["Categoria_Cuadrante"]:

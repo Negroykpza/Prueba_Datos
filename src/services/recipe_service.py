@@ -116,7 +116,7 @@ class RecipeService:
         - Margen de Contribución Unitario ($ CLP)
         - Margen de Contribución (%)
         - Margen Total Acumulado ($ CLP)
-        - Clasificación en Cuadrante (🌟 Estrella, 🐎 Caballo de Batalla, 🧩 Puzzle, 🐕 Perro)
+        - Clasificación en Cuadrante (🌟 Estrella, 🐎 Caballo de Batalla, 🧩 Rompecabezas, 🐕 Perro)
         """
         columns = [
             "Plato",
@@ -260,7 +260,7 @@ class RecipeService:
             elif high_rot and not high_mar:
                 return "🐎 Caballo de Batalla"
             elif not high_rot and high_mar:
-                return "🧩 Puzzle"
+                return "🧩 Rompecabezas"
             else:
                 return "🐕 Perro"
 

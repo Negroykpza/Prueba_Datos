@@ -63,6 +63,8 @@ def init_app_state():
         st.session_state["margen_pct"] = 15
     if "solo_fin_semana" not in st.session_state:
         st.session_state["solo_fin_semana"] = True
+    if "periodo_abastecimiento" not in st.session_state:
+        st.session_state["periodo_abastecimiento"] = "🎯 Solo Fin de Semana (Vie - Sáb - Dom)"
 
 
 def main():
