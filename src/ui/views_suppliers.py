@@ -5,7 +5,7 @@ from datetime import timedelta
 import streamlit as st
 import pandas as pd
 from src.services.forecasting import ForecastingEngine
-from src.services.procurement import ProcurementService
+from src.services.procurement import ProcurementService, _strip_emojis
 from src.config import APP_NAME
 
 
@@ -122,9 +122,10 @@ def render_suppliers_view(
             with col_btn2:
                 encoded_msg = urllib.parse.quote(wa_text_prov)
                 wa_url = f"https://wa.me/?text={encoded_msg}"
-                st.link_button(f"📲 Abrir en WhatsApp Web ({prov.split('(')[0].strip()})", wa_url, use_container_width=True)
+                clean_prov_label = _strip_emojis(prov.split('(')[0].strip())
+                st.link_button(f"📲 Abrir en WhatsApp Web ({clean_prov_label})", wa_url, use_container_width=True)
 
-            with st.expander(f"👁️ Ver mensaje formateado para {prov}", expanded=st.session_state.get(f"show_wa_{idx}", False)):
+            with st.expander(f"👁️ Ver mensaje formateado para {clean_prov_label}", expanded=st.session_state.get(f"show_wa_{idx}", False)):
                 st.code(wa_text_prov, language="text")
 
     st.markdown("---")

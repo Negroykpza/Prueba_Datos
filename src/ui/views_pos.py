@@ -29,10 +29,7 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
     with col_up2:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
         if st.button("🚀 Usar Datos Demo de 90 Días", type="secondary", use_container_width=True, help="Carga 90 días de historial calibrado con demanda de fin de semana en Chile."):
-            with st.status("🚀 Procesando datos de demostración...", expanded=True) as status:
-                st.write("Generando 90 días de historial gastronómico chileno...")
-                time.sleep(0.2)
-                st.write("Analizando patrones de demanda por día de la semana...")
+            with st.spinner("Procesando datos de demostración..."):
                 time.sleep(0.2)
                 df_demo = pos_parser.load_demo_data()
                 st.session_state["sales_df"] = df_demo
@@ -40,32 +37,23 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
                 detected = pos_parser.extract_unique_dishes(df_demo)
                 st.session_state["detected_dishes"] = detected
                 recipe_service.sync_with_detected_dishes(detected)
-                st.write("Sincronizando platos detectados con la carta...")
-                status.update(label="✅ ¡Datos de demo cargados y normalizados con éxito!", state="complete", expanded=False)
             st.toast(f"✅ ¡{len(detected)} platos detectados en los datos de demostración!")
 
-    # Procesar archivo subido por el usuario con animación de progreso
+    # Procesar archivo subido por el usuario
     if uploaded_file is not None:
         try:
-            with st.status("⚡ Procesando archivo CSV en EZtock...", expanded=True) as status:
-                st.write("Detectando codificación de caracteres y delimitadores...")
+            with st.spinner("Procesando archivo CSV en EZtock..."):
                 time.sleep(0.2)
-                st.write("Mapeando columnas de Fecha, Plato y Cantidad vendida...")
                 df_parsed = pos_parser.parse_csv(uploaded_file)
-                time.sleep(0.2)
-                st.write("Validando y normalizando formatos de fecha...")
                 st.session_state["sales_df"] = df_parsed
                 st.session_state["pos_summary"] = pos_parser.get_summary(df_parsed)
                 detected = pos_parser.extract_unique_dishes(df_parsed)
                 st.session_state["detected_dishes"] = detected
                 recipe_service.sync_with_detected_dishes(detected)
-                st.write(f"Identificando {len(detected)} platos únicos de la carta...")
-                status.update(label="✅ ¡Archivo normalizado y procesado exitosamente!", state="complete", expanded=False)
 
             st.toast(f"✅ Se normalizaron {len(df_parsed):,} registros exitosamente.")
         except Exception as e:
-            st.error(f"❌ Error al procesar el archivo CSV: {str(e)}")
-            st.info("Asegúrate de que el CSV contenga al menos una columna de fecha, una de plato y una de cantidad.")
+            st.error(f"❌ Error al procesar el archivo CSV: {str(e)}. Verifica que contenga columnas de fecha, plato y cantidad.")
 
     # Mostrar diagnóstico y analítica si hay datos cargados
     if st.session_state.get("sales_df") is not None:
@@ -275,4 +263,4 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
         st.markdown('</div>', unsafe_allow_html=True)
 
     else:
-        st.info("Sube tu archivo CSV de ventas o presiona 'Usar Datos Demo de 90 Días' para iniciar el diagnóstico en EZtock.")
+        st.caption("Carga un archivo CSV de ventas arriba o presiona 'Usar Datos Demo de 90 Días' para iniciar el diagnóstico en EZtock.")

@@ -19,10 +19,11 @@ from src.config import (
 
 
 def _strip_emojis(text: str) -> str:
-    """Elimina emojis y caracteres graficos no estandar para evitar fallos de codificacion en mensajes B2B."""
+    """Elimina emojis y simbolos graficos no estandar para garantizar texto plano ASCII y evitar caracteres corruptos."""
     if not text:
         return ""
-    cleaned = re.sub(r'[\U00010000-\U0010ffff\u2600-\u27bf\u2300-\u23ff\ufe0f]', '', str(text))
+    pattern = re.compile(r'[\U00010000-\U0010ffff\u200d\u20e3\u2300-\u27bf\u2900-\u2bff\ufe00-\ufe0f]')
+    cleaned = pattern.sub('', str(text))
     return re.sub(r'\s+', ' ', cleaned).strip()
 
 
@@ -338,8 +339,8 @@ class ProcurementService:
 
         lines.append("------------------------")
         lines.append(f"TOTAL PROVEEDOR: {subtotal_str} CLP")
-        lines.append("Favor confirmar recepción.")
-        lines.append(f"Enviado vía {APP_NAME}")
+        lines.append("Favor confirmar recepcion.")
+        lines.append(f"Enviado via {APP_NAME}")
         return "\n".join(lines)
 
     def calculate_waste_and_cost_metrics(
@@ -402,8 +403,8 @@ class ProcurementService:
         lines = [
             f"ORDEN DE COMPRA - {APP_NAME.upper()}",
             f"Restaurante: {clean_rest}",
-            f"Período: {clean_periodo}",
-            "Colchón: Demanda calculada + 15% seguridad",
+            f"Periodo: {clean_periodo}",
+            "Colchon: Demanda calculada + 15% seguridad",
             "------------------------"
         ]
 
@@ -419,8 +420,8 @@ class ProcurementService:
         lines.append("------------------------")
         if total_clp_str:
             lines.append(f"TOTAL ORDEN: {total_clp_str} CLP")
-        lines.append("Favor confirmar recepción.")
-        lines.append(f"Enviado vía {APP_NAME}")
+        lines.append("Favor confirmar recepcion.")
+        lines.append(f"Enviado via {APP_NAME}")
         return "\n".join(lines)
 
     def generate_pdf_report(

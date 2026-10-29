@@ -358,8 +358,9 @@ def render_info_banner(title: str, message: str):
 
 def scroll_to_top():
     """
-    Ejecuta un Scroll to Top automático e instantáneo al cambiar de pestaña en Streamlit.
-    Utiliza st.components.v1.html con token dinámico y blur de foco para garantizar ejecución en cada navegación.
+    Ejecuta un Scroll to Top automatico e instantaneo al cambiar de pestana en Streamlit.
+    Utiliza st.components.v1.html con token dinamico, desenfoque de foco y observador de mutacion
+    para garantizar el desplazamiento al tope superior (top: 0) en cualquier navegador.
     """
     import streamlit.components.v1 as components
     import time
@@ -372,7 +373,6 @@ def scroll_to_top():
             margin: 0 !important;
             padding: 0 !important;
             height: 0 !important;
-            width: 0 !important;
             overflow: hidden !important;
         }}
     </style>
@@ -385,9 +385,15 @@ def scroll_to_top():
                         if (doc.activeElement && typeof doc.activeElement.blur === 'function') {{
                             doc.activeElement.blur();
                         }}
+                        const mainSection = doc.querySelector('section.main');
+                        if (mainSection) {{
+                            mainSection.scrollTop = 0;
+                            if (typeof mainSection.scrollTo === 'function') {{
+                                mainSection.scrollTo({{top: 0, left: 0, behavior: 'instant'}});
+                            }}
+                        }}
                         const targets = [
                             doc.querySelector('[data-testid="stAppViewContainer"]'),
-                            doc.querySelector('section.main'),
                             doc.querySelector('[data-testid="stMain"]'),
                             doc.querySelector('.stMain'),
                             doc.querySelector('.main'),
@@ -422,7 +428,18 @@ def scroll_to_top():
             setTimeout(performScroll, 160);
             setTimeout(performScroll, 320);
             setTimeout(performScroll, 600);
+            try {{
+                if (window.parent && window.parent.document) {{
+                    const doc = window.parent.document;
+                    const obsTarget = doc.querySelector('section.main') || doc.body;
+                    if (obsTarget) {{
+                        const obs = new MutationObserver(performScroll);
+                        obs.observe(obsTarget, {{ childList: true, subtree: true }});
+                        setTimeout(() => obs.disconnect(), 1200);
+                    }}
+                }}
+            }} catch(e) {{}}
         }})();
     </script>
     """
-    components.html(js_code, height=0, width=0)
+    components.html(js_code, height=0)
