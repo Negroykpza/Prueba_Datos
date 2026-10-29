@@ -1,6 +1,7 @@
 """Servicio de cálculo de requerimientos de materias primas, costeo en CLP, estimación de mermas y exportaciones EZtock."""
 
 import io
+import re
 from typing import Dict, List, Optional, Tuple
 import pandas as pd
 from reportlab.lib.pagesizes import letter
@@ -15,6 +16,14 @@ from src.config import (
     SUPPLIER_KEYWORDS,
     DEFAULT_SUPPLIER
 )
+
+
+def _strip_emojis(text: str) -> str:
+    """Elimina emojis y caracteres graficos no estandar para evitar fallos de codificacion en mensajes B2B."""
+    if not text:
+        return ""
+    cleaned = re.sub(r'[\U00010000-\U0010ffff\u2600-\u27bf\u2300-\u23ff\ufe0f]', '', str(text))
+    return re.sub(r'\s+', ' ', cleaned).strip()
 
 
 # Niveles de riesgo de merma por caducidad en gastronomía chilena
@@ -300,35 +309,37 @@ class ProcurementService:
         restaurant_name: str = "Mi Restaurante",
         periodo_label: str = "Fin de Semana"
     ) -> str:
-        """Genera un mensaje de WhatsApp limpio e independiente específico para un proveedor."""
+        """Genera un mensaje de WhatsApp plano, formal y estructurado sin emojis para evitar caracteres corruptos."""
+        clean_supplier = _strip_emojis(supplier_name)
+        clean_rest = _strip_emojis(restaurant_name)
+        clean_periodo = _strip_emojis(periodo_label)
+
         if supplier_df.empty:
-            return f"No hay insumos para {supplier_name}."
+            return f"No hay insumos para {clean_supplier}."
 
         subtotal_prov = int(supplier_df["subtotal_cost_clp"].sum())
         subtotal_str = f"${subtotal_prov:,}".replace(",", ".")
 
         lines = [
-            f"🛒 *ORDEN DE COMPRA - {APP_NAME.upper()}*",
-            f"🏪 *Restaurante:* {restaurant_name}",
-            f"📦 *Proveedor:* {supplier_name}",
-            f"📅 *Entrega:* {periodo_label}",
-            "─────────────────────────"
+            f"ORDEN DE COMPRA - {APP_NAME.upper()}",
+            f"Restaurante: {clean_rest}",
+            f"Proveedor: {clean_supplier}",
+            f"Entrega: {clean_periodo}",
+            "------------------------"
         ]
 
         for _, row in supplier_df.iterrows():
-            insumo = row["insumo"]
+            insumo = _strip_emojis(str(row["insumo"]))
             total = row["total_sugerido"]
-            unidad = row["unidad"]
+            unidad = _strip_emojis(str(row["unidad"]))
             cost_val = row.get("subtotal_cost_clp", 0.0)
             cost_str = f" (${int(cost_val):,}".replace(",", ".") + " CLP)" if cost_val > 0 else ""
-            riesgo = row.get("riesgo_caducidad", "MEDIO")
-            icono = "🔴" if riesgo == "CRÍTICO" else ("🟡" if riesgo == "ALTO" else "🟢")
-            lines.append(f"{icono} *{insumo}*: {total} {unidad}{cost_str}")
+            lines.append(f"- {insumo}: {total} {unidad}{cost_str}")
 
-        lines.append("─────────────────────────")
-        lines.append(f"💰 *TOTAL PROVEEDOR:* {subtotal_str} CLP")
-        lines.append("Favor confirmar recepción y horario estimado de despacho. ¡Muchas gracias!")
-        lines.append(f"🥑 Enviado vía *{APP_NAME}*")
+        lines.append("------------------------")
+        lines.append(f"TOTAL PROVEEDOR: {subtotal_str} CLP")
+        lines.append("Favor confirmar recepción.")
+        lines.append(f"Enviado vía {APP_NAME}")
         return "\n".join(lines)
 
     def calculate_waste_and_cost_metrics(
@@ -379,35 +390,37 @@ class ProcurementService:
         periodo_label: str = "Fin de Semana",
         metrics: Optional[Dict] = None
     ) -> str:
-        """Genera un mensaje de texto formateado listo para enviar a proveedores bajo la marca EZtock."""
+        """Genera un mensaje de texto formal sin emojis listo para enviar bajo la marca EZtock."""
+        clean_rest = _strip_emojis(restaurant_name)
+        clean_periodo = _strip_emojis(periodo_label)
+
         if shopping_df.empty:
             return "No hay insumos proyectados para el período seleccionado."
 
         total_clp_str = f"${int(metrics['total_orden_clp']):,}".replace(",", ".") if metrics else ""
 
         lines = [
-            f"🛒 *ORDEN DE COMPRA - {APP_NAME.upper()}*",
-            f"🏪 *Restaurante:* {restaurant_name}",
-            f"📅 *Período:* {periodo_label}",
-            "🛡️ *Colchón:* Demanda calculada + 15% seguridad",
-            "─────────────────────────"
+            f"ORDEN DE COMPRA - {APP_NAME.upper()}",
+            f"Restaurante: {clean_rest}",
+            f"Período: {clean_periodo}",
+            "Colchón: Demanda calculada + 15% seguridad",
+            "------------------------"
         ]
 
         for _, row in shopping_df.iterrows():
-            insumo = row["insumo"]
+            insumo = _strip_emojis(str(row["insumo"]))
             total = row["total_sugerido"]
-            unidad = row["unidad"]
+            unidad = _strip_emojis(str(row["unidad"]))
             cost_val = row.get('subtotal_cost_clp', 0.0)
             subtotal = f"${int(cost_val):,}".replace(",", ".") if cost_val > 0 else ""
             subtotal_str = f" ({subtotal} CLP)" if subtotal else ""
-            riesgo = row.get("riesgo_caducidad", "MEDIO")
-            icono = "🔴" if riesgo == "CRÍTICO" else ("🟠" if riesgo == "ALTO" else "🟢")
-            lines.append(f"{icono} *{insumo}*: {total} {unidad}{subtotal_str}")
+            lines.append(f"- {insumo}: {total} {unidad}{subtotal_str}")
 
-        lines.append("─────────────────────────")
+        lines.append("------------------------")
         if total_clp_str:
-            lines.append(f"💰 *COSTO ESTIMADO ORDEN:* {total_clp_str} CLP")
-        lines.append(f"🥑 *{APP_NAME}* | {APP_TAGLINE}")
+            lines.append(f"TOTAL ORDEN: {total_clp_str} CLP")
+        lines.append("Favor confirmar recepción.")
+        lines.append(f"Enviado vía {APP_NAME}")
         return "\n".join(lines)
 
     def generate_pdf_report(

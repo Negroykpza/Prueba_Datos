@@ -7,19 +7,14 @@ import streamlit as st
 from src.config import APP_NAME, DAYS_OF_WEEK_ES, TAB_OPTIONS, set_active_tab
 from src.services.pos_parser import POSParser
 from src.services.recipe_service import RecipeService
-from src.ui.components import render_info_banner, render_metric_card
+from src.ui.components import render_metric_card
 
 
 def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
     st.markdown(f'<div class="main-header">📂 Ingesta & Normalización de Ventas POS | {APP_NAME}</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="sub-header">Carga cualquier reporte de ventas (Fudo, Restobar, Totem, Excel exportado). Detectamos automáticamente columnas y platos de tu carta.</div>',
+        '<div class="sub-header">Carga cualquier reporte de ventas (Fudo, Restobar, Totem, Bsale o Excel). Detectamos automáticamente columnas y platos de tu carta.</div>',
         unsafe_allow_html=True
-    )
-
-    render_info_banner(
-        "💡 Flexibilidad Total de Archivos",
-        "No requieres cambiar los nombres de tus columnas. Nuestro motor inteligente detecta automáticamente fecha, nombre de plato y cantidad vendida."
     )
 
     col_up1, col_up2 = st.columns([2, 1])
@@ -28,17 +23,17 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
         uploaded_file = st.file_uploader(
             "Arrastra o selecciona el archivo CSV de ventas de tu restaurante:",
             type=["csv"],
-            help="Soporta exportaciones de cualquier POS gastronómico común en Chile."
+            help="Compatible con exportaciones de Fudo, Restobar, Totem, Bsale o Excel. Detecta automáticamente fecha, plato y cantidad vendida."
         )
 
     with col_up2:
-        st.write("**¿No tienes un archivo a mano?**")
-        if st.button("🚀 Usar Datos Demo de 90 Días", type="secondary", use_container_width=True):
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        if st.button("🚀 Usar Datos Demo de 90 Días", type="secondary", use_container_width=True, help="Carga 90 días de historial calibrado con demanda de fin de semana en Chile."):
             with st.status("🚀 Procesando datos de demostración...", expanded=True) as status:
                 st.write("Generando 90 días de historial gastronómico chileno...")
-                time.sleep(0.3)
+                time.sleep(0.2)
                 st.write("Analizando patrones de demanda por día de la semana...")
-                time.sleep(0.3)
+                time.sleep(0.2)
                 df_demo = pos_parser.load_demo_data()
                 st.session_state["sales_df"] = df_demo
                 st.session_state["pos_summary"] = pos_parser.get_summary(df_demo)
@@ -217,7 +212,6 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
 
         # Escalabilidad en "Platos Detectados": Tabla Compacta con Métricas
         st.subheader("🍽️ Desglose de Platos Detectados en tu Carta")
-        st.markdown("<span style='font-size: 0.88rem; color: #94A3B8;'>Lista escalable para cartas extensas (50+ platos) con métricas de participación en ventas:</span>", unsafe_allow_html=True)
 
         dish_stats = (
             df.groupby("plato", as_index=False)
@@ -255,20 +249,8 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
 
         st.markdown("---")
 
-        # Inspección de Registros Normalizados con Mayor Jerarquía Visual
-        st.markdown("""
-            <div class="data-inspect-card">
-                <div class="data-inspect-header">
-                    <span style="font-weight: 700; font-size: 1rem; color: #F1F5F9;">🔍 Explorador de Registros Normalizados</span>
-                    <span class="delta-pill delta-positive">Datos Limpios y Validados</span>
-                </div>
-                <span style="font-size: 0.85rem; color: #94A3B8;">
-                    Inspecciona las transacciones normalizadas por EZtock o descarga el archivo estandarizado para tus reportes.
-                </span>
-            </div>
-        """, unsafe_allow_html=True)
-
-        with st.expander("📂 Abrir Tabla Completa de Registros Normalizados (Primeras 100 filas)", expanded=False):
+        # Inspección limpia de Registros Normalizados
+        with st.expander("🔍 Explorador de Registros Normalizados (Primeras 100 filas)", expanded=False):
             st.dataframe(df.head(100), use_container_width=True, hide_index=True)
             csv_export = df.to_csv(index=False).encode("utf-8")
             st.download_button(
@@ -293,4 +275,4 @@ def render_pos_view(pos_parser: POSParser, recipe_service: RecipeService):
         st.markdown('</div>', unsafe_allow_html=True)
 
     else:
-        st.info("👆 Sube tu archivo CSV de ventas o presiona 'Usar Datos Demo' para iniciar el diagnóstico inteligente en EZtock.")
+        st.info("Sube tu archivo CSV de ventas o presiona 'Usar Datos Demo de 90 Días' para iniciar el diagnóstico en EZtock.")

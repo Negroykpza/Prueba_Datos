@@ -127,7 +127,7 @@ def main():
 
     # Scroll to Top automático al cambiar de sección o presionar botones de avance
     last_rendered_tab = st.session_state.get("_last_rendered_tab")
-    must_scroll = st.session_state.pop("trigger_scroll_top", False)
+    must_scroll = st.session_state.pop("trigger_scroll_top", False) or st.session_state.pop("scroll_to_top", False)
     if must_scroll or last_rendered_tab != active_tab:
         scroll_to_top()
         st.session_state["_last_rendered_tab"] = active_tab

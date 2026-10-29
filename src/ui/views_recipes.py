@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 from src.services.recipe_service import RecipeService
 from src.config import APP_NAME, TAB_OPTIONS, set_active_tab
-from src.ui.components import render_info_banner, render_metric_card
+from src.ui.components import render_metric_card
 
 
 def render_recipes_view(recipe_service: RecipeService):
@@ -12,11 +12,6 @@ def render_recipes_view(recipe_service: RecipeService):
     st.markdown(
         '<div class="sub-header">Gestiona los ingredientes por plato y el costo de compra en pesos chilenos ($ CLP).</div>',
         unsafe_allow_html=True
-    )
-
-    render_info_banner(
-        "⚡ Editor Directo y Flexible de Ingredientes",
-        "Edita las celdas directamente en la tabla: modifica gramos o porciones por plato, agrega nuevos insumos o actualiza los precios en pesos chilenos (<code>$ CLP</code>). Al terminar, presiona <strong>💾 Guardar Cambios</strong>."
     )
 
     # Si hay platos detectados dinámicamente en el POS, sincronizarlos
@@ -27,7 +22,7 @@ def render_recipes_view(recipe_service: RecipeService):
     # Cargar datos actuales de recetas
     recipes_df = recipe_service.to_dataframe()
 
-    # Métricas enriquecidas de la carta en Dark Mode
+    # Métricas de la carta en Dark Mode
     platos_count = recipes_df["Plato"].nunique() if not recipes_df.empty else 0
     insumos_count = recipes_df["Insumo Perecible"].nunique() if not recipes_df.empty else 0
     precio_promedio = recipes_df["Precio Compra ($ CLP)"].mean() if not recipes_df.empty else 0
@@ -60,8 +55,7 @@ def render_recipes_view(recipe_service: RecipeService):
         )
 
     st.markdown("---")
-    st.subheader("📋 Tabla Interactiva de Ingredientes y Costos por Plato")
-    st.markdown("<span style='font-size: 0.88rem; color: #94A3B8;'>Modifica los valores directamente o presiona '+' abajo para agregar nuevos ingredientes a cualquier plato:</span>", unsafe_allow_html=True)
+    st.subheader("📋 Ingredientes y Costos por Plato")
 
     # Configuración de columnas para st.data_editor
     column_config = {
@@ -96,7 +90,7 @@ def render_recipes_view(recipe_service: RecipeService):
         ),
         "Precio Compra ($ CLP)": st.column_config.NumberColumn(
             "Precio Compra ($ CLP)",
-            help="Precio neto que pagas por Kilo, Litro o Unidad a tu proveedor en Chile.",
+            help="Precio neto por Kilo, Litro o Unidad pactado con tu proveedor (ej: Reineta $9.500 CLP/kg, Salmón $14.000 CLP/kg, Lomo $9.800 CLP/kg). Determina el costo total y el ahorro mensual.",
             min_value=100,
             max_value=500000,
             step=500,
@@ -138,24 +132,16 @@ def render_recipes_view(recipe_service: RecipeService):
     col_btn_save, col_btn_reset, _ = st.columns([1.2, 1.2, 2.5])
 
     with col_btn_save:
-        if st.button("💾 Guardar Cambios en Recetas", type="primary", use_container_width=True):
+        if st.button("💾 Guardar Cambios en Recetas", type="primary", use_container_width=True, help="Guarda los ingredientes y precios modificados para recalcular compras y costos."):
             recipe_service.update_from_dataframe(edited_df, filtered_dish=selected_dish)
             st.success("✅ ¡Recetas y precios en $ CLP guardados exitosamente!")
             st.toast("✅ Recetas e ingredientes actualizados para el cálculo de compras.")
 
     with col_btn_reset:
-        if st.button("🔄 Restaurar Valores por Defecto", use_container_width=True):
+        if st.button("🔄 Restaurar Valores por Defecto", use_container_width=True, help="Restaura las recetas e insumos predeterminados de la carta."):
             recipe_service.reset_to_defaults()
             st.warning("⚠️ Se restauraron las recetas y precios de compra base en $ CLP.")
             st.rerun()
-
-    # Tip culinario y de costos en Dark Mode
-    st.markdown("""
-        <div class="banner-tip-dark" style="margin-top: 20px;">
-            <strong>💡 Recomendación de Costeo Gastronómico:</strong><br>
-            Al ingresar el <strong>Precio Compra ($ CLP)</strong>, utiliza el valor neto pactado con tu distribuidor o feria (ej: Reineta $9.500 CLP/kg, Salmón $14.000 CLP/kg, Lomo Vacuno $9.800 CLP/kg). Esto permitirá calcular con exactitud el valor total de tu orden de compra en las Pestañas 3 y 4, así como el ahorro mensual por merma prevenida.
-        </div>
-    """, unsafe_allow_html=True)
 
     # Botón CTA hacia la Pestaña 3 con callback seguro on_click
     st.markdown('<div class="cta-container">', unsafe_allow_html=True)

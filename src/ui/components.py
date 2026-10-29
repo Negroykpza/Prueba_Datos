@@ -359,26 +359,32 @@ def render_info_banner(title: str, message: str):
 def scroll_to_top():
     """
     Ejecuta un Scroll to Top automático e instantáneo al cambiar de pestaña en Streamlit.
-    Utiliza st.components.v1.html con contenedor de cero dimensiones para no generar espacios en blanco.
+    Utiliza st.components.v1.html con token dinámico y blur de foco para garantizar ejecución en cada navegación.
     """
     import streamlit.components.v1 as components
+    import time
 
-    js_code = """
+    token = time.time()
+    js_code = f"""
+    <!-- scroll_token: {token} -->
     <style>
-        html, body {
+        html, body {{
             margin: 0 !important;
             padding: 0 !important;
             height: 0 !important;
             width: 0 !important;
             overflow: hidden !important;
-        }
+        }}
     </style>
     <script>
-        (function() {
-            function performScroll() {
-                try {
-                    if (window.parent && window.parent.document) {
+        (function() {{
+            function performScroll() {{
+                try {{
+                    if (window.parent && window.parent.document) {{
                         const doc = window.parent.document;
+                        if (doc.activeElement && typeof doc.activeElement.blur === 'function') {{
+                            doc.activeElement.blur();
+                        }}
                         const targets = [
                             doc.querySelector('[data-testid="stAppViewContainer"]'),
                             doc.querySelector('section.main'),
@@ -388,36 +394,35 @@ def scroll_to_top():
                             doc.documentElement,
                             doc.body
                         ];
-                        for (let i = 0; i < targets.length; i++) {
+                        for (let i = 0; i < targets.length; i++) {{
                             const el = targets[i];
-                            if (el) {
+                            if (el) {{
                                 el.scrollTop = 0;
-                                if (typeof el.scrollTo === 'function') {
-                                    el.scrollTo({top: 0, left: 0, behavior: 'instant'});
-                                }
-                            }
-                        }
+                                if (typeof el.scrollTo === 'function') {{
+                                    el.scrollTo({{top: 0, left: 0, behavior: 'instant'}});
+                                }}
+                            }}
+                        }}
                         const headerEl = doc.querySelector('[data-testid="stHeader"]') || doc.querySelector('header');
-                        if (headerEl && typeof headerEl.scrollIntoView === 'function') {
-                            headerEl.scrollIntoView({behavior: 'instant', block: 'start'});
-                        }
-                    }
-                    if (window.parent && typeof window.parent.scrollTo === 'function') {
-                        window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
-                    }
-                } catch (err) {
+                        if (headerEl && typeof headerEl.scrollIntoView === 'function') {{
+                            headerEl.scrollIntoView({{behavior: 'instant', block: 'start'}});
+                        }}
+                    }}
+                    if (window.parent && typeof window.parent.scrollTo === 'function') {{
+                        window.parent.scrollTo({{top: 0, left: 0, behavior: 'instant'}});
+                    }}
+                }} catch (err) {{
                     console.warn("EZtock Scroll-to-Top:", err);
-                }
-            }
+                }}
+            }}
             performScroll();
             requestAnimationFrame(performScroll);
             setTimeout(performScroll, 30);
             setTimeout(performScroll, 80);
-            setTimeout(performScroll, 150);
-            setTimeout(performScroll, 300);
-        })();
+            setTimeout(performScroll, 160);
+            setTimeout(performScroll, 320);
+            setTimeout(performScroll, 600);
+        }})();
     </script>
     """
     components.html(js_code, height=0, width=0)
-
-
