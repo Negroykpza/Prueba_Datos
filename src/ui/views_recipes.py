@@ -143,15 +143,10 @@ def render_recipes_view(recipe_service: RecipeService):
             st.warning("⚠️ Se restauraron las recetas y precios de compra base en $ CLP.")
             st.rerun()
 
-    # Botón CTA hacia la Pestaña 3 con callback seguro on_click
-    st.markdown('<div class="cta-container">', unsafe_allow_html=True)
-    col_spacer, col_cta = st.columns([1.5, 1])
-    with col_cta:
-        st.button(
-            "Continuar a Dashboard Financiero & Fugas ($ CLP) ➡️",
-            type="primary",
-            use_container_width=True,
-            on_click=set_active_tab,
-            args=(TAB_OPTIONS[2],)
-        )
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.button(
+        "Continuar a Dashboard Financiero & Fugas ($ CLP) ➡️",
+        type="primary",
+        use_container_width=True,
+        on_click=set_active_tab,
+        args=(TAB_OPTIONS[2],)
+    )
