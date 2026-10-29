@@ -229,6 +229,7 @@ class ProcurementService:
 
         # 1. Identificar Frena Compras (insumos no críticos o con bajo consumo / sobrestock seguro)
         insumos_bodega = [
+            ("Lomo Liso Vacuno", "Stock remanente en cámara frigorífica de 28 kg cubre ampliamente la demanda del fin de semana. Frenar compra para no inmovilizar capital.", 274400),
             ("Cebolla Morada", "Stock remanente en bodega fresca cubre la demanda de los próximos 4 días. Frenar compra para no acumular merma.", 28000),
             ("Zapallo Camote", "Inventario disponible en verdulería suficiente para el turno familiar de domingo.", 18000),
             ("Pasta de Choclo", "Stock congelado en cámara frigorífica cubre pedidos proyectados de Pastel de Choclo.", 32000),

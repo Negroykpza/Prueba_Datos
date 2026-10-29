@@ -157,15 +157,15 @@ class POSParser:
         start_date = end_date - timedelta(days=90)
 
         dishes = [
-            ("Ceviche Mixto", 18, 35),
-            ("Ceviche Clásico", 15, 30),
-            ("Lomo Saltado", 16, 32),
-            ("Pastel de Choclo", 12, 28),
-            ("Salmón Grillé", 10, 22),
-            ("Tartar de Atún", 8, 18),
-            ("Empanada de Pino", 25, 55),
-            ("Machas a la Parmesana", 12, 28),
-            ("Cazuela de Vacuno", 10, 22)
+            ("Ceviche Mixto", 28, 42),         # ESTRELLA CLARA (Alta rotación, alto margen)
+            ("Lomo Saltado", 18, 30),          # Alta rotación, alto margen
+            ("Ceviche Clásico", 16, 28),       # Media-alta rotación, alto margen
+            ("Empanada de Pino", 35, 60),      # CABALLO DE BATALLA (Altísima rotación, bajo margen)
+            ("Pastel de Choclo", 12, 22),      # Media-baja rotación
+            ("Machas a la Parmesana", 12, 20), # Media rotación
+            ("Salmón Grillé", 6, 14),          # ROMPECABEZAS (Baja rotación, alto margen)
+            ("Tartar de Atún", 5, 12),         # ROMPECABEZAS (Baja rotación, alto margen)
+            ("Cazuela de Vacuno", 4, 10)       # PERRO CLARO (Baja rotación, bajo margen)
         ]
 
         rows = []
@@ -174,7 +174,7 @@ class POSParser:
         rng = random.Random(42)
         while cur <= end_date:
             is_weekend = cur.weekday() in [4, 5, 6]  # Viernes, Sábado, Domingo
-            multiplier = 1.5 if is_weekend else 1.0
+            multiplier = 1.6 if is_weekend else 1.0
             for dish, base_min, base_max in dishes:
                 qty = int(rng.randint(base_min, base_max) * multiplier)
                 rows.append({

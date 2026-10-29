@@ -378,23 +378,32 @@ def scroll_to_top():
             function performScroll() {
                 try {
                     if (window.parent && window.parent.document) {
-                        const mainSection = window.parent.document.querySelector('section.main');
-                        if (mainSection) {
-                            mainSection.scrollTo({top: 0, behavior: 'instant'});
+                        const doc = window.parent.document;
+                        const targets = [
+                            doc.querySelector('[data-testid="stAppViewContainer"]'),
+                            doc.querySelector('section.main'),
+                            doc.querySelector('[data-testid="stMain"]'),
+                            doc.querySelector('.stMain'),
+                            doc.querySelector('.main'),
+                            doc.documentElement,
+                            doc.body
+                        ];
+                        for (let i = 0; i < targets.length; i++) {
+                            const el = targets[i];
+                            if (el) {
+                                el.scrollTop = 0;
+                                if (typeof el.scrollTo === 'function') {
+                                    el.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                                }
+                            }
                         }
-                        const stMain = window.parent.document.querySelector('[data-testid="stMain"]');
-                        if (stMain && stMain !== mainSection) {
-                            stMain.scrollTo({top: 0, behavior: 'instant'});
-                        }
-                        if (window.parent.document.documentElement) {
-                            window.parent.document.documentElement.scrollTop = 0;
-                        }
-                        if (window.parent.document.body) {
-                            window.parent.document.body.scrollTop = 0;
+                        const headerEl = doc.querySelector('[data-testid="stHeader"]') || doc.querySelector('header');
+                        if (headerEl && typeof headerEl.scrollIntoView === 'function') {
+                            headerEl.scrollIntoView({behavior: 'instant', block: 'start'});
                         }
                     }
-                    if (window.parent) {
-                        window.parent.scrollTo({top: 0, behavior: 'instant'});
+                    if (window.parent && typeof window.parent.scrollTo === 'function') {
+                        window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
                     }
                 } catch (err) {
                     console.warn("EZtock Scroll-to-Top:", err);
@@ -402,8 +411,10 @@ def scroll_to_top():
             }
             performScroll();
             requestAnimationFrame(performScroll);
-            setTimeout(performScroll, 50);
+            setTimeout(performScroll, 30);
+            setTimeout(performScroll, 80);
             setTimeout(performScroll, 150);
+            setTimeout(performScroll, 300);
         })();
     </script>
     """
